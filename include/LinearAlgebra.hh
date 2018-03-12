@@ -39,7 +39,7 @@ void LUPDecomposition(Matrix<double> &luMatrix, Vector<int> &rowPermutaions, int
 // Returns the eigenvalues and eigenvectors of the matrix. This method is only suitable for
 // symetric matrix
 void EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors,
-                 Vector<double> &eigenValues, int nrot = 0, int maxSweeps = 5000);
+                 Vector<double> &eigenValues);
 
 // Solves a generalised eiganvalue problem of the form Ax = Bex. Both A and B must be symetric
 // matrices for this method to work

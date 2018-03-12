@@ -1,7 +1,6 @@
 #include <cmath>
 #include <limits>
-#include <fenv.h>
-#include <xmmintrin.h>
+#include <Eigen>
 
 #include "LinearAlgebra.hh"
 #include "Vector.hh"
@@ -225,6 +224,46 @@ void LinearAlgebra::LUPDecomposition(Matrix<double> &luMatrix, Vector<int> &rowP
 	}
 }
 
+void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors,
+                                 Vector<double> &eigenValues)
+{
+	// Need to first get data from Matrix class and map to an Eigen matrix class
+	Eigen::MatrixXd eMatrix(matrix.GetRows(), matrix.GetColumns());
+	for (int i = 0; i < matrix.GetColumns(); i++)
+	{
+		eMatrix.col(i) = Eigen::Map<Eigen::VectorXd> (matrix[i], matrix.GetRows());
+	}
+
+	// Now set up the solver and find eigen vector/values
+	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver;
+	eigenSolver.compute(eMatrix);
+
+	// Now transfer data overt to eigenVector and eiganValues
+	for (int i = 0; i < eigenVectors.GetRows(); i++)
+	{
+		eigenValues[i] = eigenSolver.eigenvalues()(i);
+		for (int j = 0; j < eigenVectors.GetColumns(); j++)
+		{
+			eigenVectors[i][j] = eigenSolver.eigenvectors()(i,j);
+		}
+	}
+}
+
+void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, const Matrix<double> &matrixRight,
+        Matrix<double> &eigenVectors, Vector<double> &eigenvalues)
+{
+	// First we need to decompose the right matrix to a lower and upper traingula
+	Matrix<double> lowerMatrixRight = CholeskyDecomposition(matrixRight);
+	// Now we form the new symetric matrix which has the same eiganvalues
+	Matrix<double> symetricMatrix = Inverse(lowerMatrixRight) * matrixLeft * Inverse(Transpose(lowerMatrixRight));
+	// Now find the eiganvalues and vectors of the matrix.
+	EigenSolver(symetricMatrix, eigenVectors, eigenvalues);
+	// Now find correct eiganvalues
+	eigenVectors = Inverse(Transpose(lowerMatrixRight)) * eigenVectors;
+}
+
+
+/*
 void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors, Vector<double> &eigenValues,
                                 int nrot, int maxSweeps)
 {
@@ -233,8 +272,6 @@ void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &ei
 	Matrix<double> A = matrix.DeepCopy();
 
 	double small = std::numeric_limits<double>::epsilon();
-	//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	//fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 
 	for (int i = 0; i < A.GetRows(); i++)
 	{
@@ -353,18 +390,4 @@ void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &ei
 		}
 	}
 }
-
-void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, const Matrix<double> &matrixRight,
-        								   Matrix<double> &eigenVectors, Vector<double> &eigenvalues)
-{
-	// First we need to decompose the right matrix to a lower and upper traingula
-	Matrix<double> lowerMatrixRight = CholeskyDecomposition(matrixRight);
-	// Now we form the new symetric matrix which has the same eiganvalues
-	Matrix<double> symetricMatrix = Inverse(lowerMatrixRight) * matrixLeft * Inverse(Transpose(lowerMatrixRight));
-	// Now find the eiganvalues and vectors of the matrix.
-	EigenSolver(symetricMatrix, eigenVectors, eigenvalues);
-	eigenvalues.Print(); 
-	// Now find correct eiganvalues
-	eigenVectors = Inverse(Transpose(lowerMatrixRight)) * eigenVectors;
-}
-
+*/

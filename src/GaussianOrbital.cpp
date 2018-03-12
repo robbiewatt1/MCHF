@@ -159,7 +159,7 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			}
 		}
 	}
-	return -4 * Constants::pi * normFactor * exponetialFactor * sum; // Not sure if it should be 2 or 1 here??
+	return -1 * Constants::pi * normFactor * exponetialFactor * sum; // Not sure if it should be 2 or 1 here??
 }
 
 void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,

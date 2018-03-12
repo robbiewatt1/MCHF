@@ -88,10 +88,8 @@ class Matrix
 			return m_nColumn;
 		}
 
-
-
 		// Prints Matrix to the screen
-		void Print()
+		void Print() const
 		{
 			std::cout << "[ ";
 			for(int i =0; i < m_nRow; i++)

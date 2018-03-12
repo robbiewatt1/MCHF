@@ -17,39 +17,39 @@
 #include <cmath>
 int main()
 {
-	Vector<GaussianOrbital> orbitV(4);
+	Vector<GaussianOrbital> orbitV(11);
 
 	orbitV[0] = GaussianOrbital(0,0,0,0.0,0.0,0.0);
-//	orbitV[1] = GaussianOrbital(1,0,0,0.0,0.0,0.0);
-//	orbitV[2] = GaussianOrbital(0,1,0,0.0,0.0,0.0);
-//	orbitV[3] = GaussianOrbital(0,0,1,0.0,0.0,0.0);
-//	orbitV[4] = GaussianOrbital(0,1,1,0.0,0.0,0.0);
-//	orbitV[5] = GaussianOrbital(1,0,1,0.0,0.0,0.0);
-//	orbitV[6] = GaussianOrbital(1,1,0,0.0,0.0,0.0);
-	orbitV[1] = GaussianOrbital(0,0,2,0.0,0.0,0.0);
-	orbitV[2] = GaussianOrbital(0,2,0,0.0,0.0,0.0);
-	orbitV[3] = GaussianOrbital(2,0,0,0.0,0.0,0.0);
+	orbitV[1] = GaussianOrbital(1,0,0,0.0,0.0,0.0);
+	orbitV[2] = GaussianOrbital(0,1,0,0.0,0.0,0.0);
+	orbitV[3] = GaussianOrbital(0,0,1,0.0,0.0,0.0);
+	orbitV[4] = GaussianOrbital(0,1,1,0.0,0.0,0.0);
+	orbitV[5] = GaussianOrbital(1,0,1,0.0,0.0,0.0);
+	orbitV[6] = GaussianOrbital(1,1,0,0.0,0.0,0.0);
+	orbitV[7] = GaussianOrbital(0,0,2,0.0,0.0,0.0);
+	orbitV[8] = GaussianOrbital(0,2,0,0.0,0.0,0.0);
+	orbitV[9] = GaussianOrbital(2,0,0,0.0,0.0,0.0);
+	orbitV[10] = GaussianOrbital(3,3,3,0.0,0.0,0.0);	
 
-	Matrix<double> SMatrix(4,4);
-	Matrix<double> EMatrix(4,4);
-	Matrix<double> eigenVectors(4,4);
-	Vector<double> eigenvalues(4);
+	Matrix<double> SMatrix(10,10);
+	Matrix<double> EMatrix(10,10);
+	Matrix<double> eigenVectors(10,10);
+	Vector<double> eigenvalues(10);
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < 10; j++)
 		{
-			EMatrix[i][j] = orbitV[i].KineticOverlap(orbitV[j]) + orbitV[i].NuclearOverlap(orbitV[j],1,0,0,0);
+			//EMatrix[i][j] = 0.333333 * orbitV[i].KineticOverlap(orbitV[j]) + orbitV[i].NuclearOverlap(orbitV[j],1,0,0,0);
+			EMatrix[i][j] = orbitV[i].KineticOverlap(orbitV[j]);
 			SMatrix[i][j] = orbitV[i].Overlap(orbitV[j]) * orbitV[j].GetNormaliseConstant() * orbitV[i].GetNormaliseConstant();
 		}
 	}
-
-
-//	LinearAlgebra::EigenSolver(EMatrix,eigenVectors,eigenvalues);
+	EMatrix.Print();
 	LinearAlgebra::GeneralisedEigenSolver(EMatrix,SMatrix,eigenVectors,eigenvalues);
-//	SMatrix.Print();
-//	EMatrix.Print();
-//	eigenVectors.Print();
-//	eigenvalues.Print();
+	eigenVectors.Print();
+	eigenvalues.Print();
+
+	std::cout << orbitV[10].KineticOverlap(orbitV[10]) << std::endl;
 	return 0;
 }
