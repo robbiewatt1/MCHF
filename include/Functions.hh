@@ -23,5 +23,4 @@ namespace Functions
 
 	double BoysFunction(int v, double u);
 }
-
 #endif

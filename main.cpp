@@ -20,6 +20,7 @@ int main()
 	Vector<GaussianOrbital> orbitV(11);
 
 	orbitV[0] = GaussianOrbital(0,0,0,0.0,0.0,0.0);
+/*
 	orbitV[1] = GaussianOrbital(1,0,0,0.0,0.0,0.0);
 	orbitV[2] = GaussianOrbital(0,1,0,0.0,0.0,0.0);
 	orbitV[3] = GaussianOrbital(0,0,1,0.0,0.0,0.0);
@@ -40,8 +41,8 @@ int main()
 	{
 		for (int j = 0; j < 10; j++)
 		{
-			//EMatrix[i][j] = 0.333333 * orbitV[i].KineticOverlap(orbitV[j]) + orbitV[i].NuclearOverlap(orbitV[j],1,0,0,0);
-			EMatrix[i][j] = orbitV[i].KineticOverlap(orbitV[j]);
+			EMatrix[i][j] = ( orbitV[i].KineticOverlap(orbitV[j]) / 1.5) + orbitV[i].NuclearOverlap(orbitV[j],1,0,0,0);
+			//EMatrix[i][j] = orbitV[i].KineticOverlap(orbitV[j]);
 			SMatrix[i][j] = orbitV[i].Overlap(orbitV[j]) * orbitV[j].GetNormaliseConstant() * orbitV[i].GetNormaliseConstant();
 		}
 	}
@@ -49,7 +50,7 @@ int main()
 	LinearAlgebra::GeneralisedEigenSolver(EMatrix,SMatrix,eigenVectors,eigenvalues);
 	eigenVectors.Print();
 	eigenvalues.Print();
-
-	std::cout << orbitV[10].KineticOverlap(orbitV[10]) << std::endl;
+*/
+	std::cout << orbitV[0].KineticOverlap(orbitV[10]) << std::endl;
 	return 0;
 }

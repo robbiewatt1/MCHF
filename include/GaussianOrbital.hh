@@ -8,10 +8,10 @@ class GaussianOrbital : public Orbital
 
 public:
 
-	GaussianOrbital();		// Default constructor
+	GaussianOrbital();	// Default constructor
 
-	GaussianOrbital(int k, int m, int n, double centrePositionX, double centrePositionY,
-	                double centrePositionZ);
+	GaussianOrbital(int k, int m, int n, double alpha, double centrePositionX,
+	                double centrePositionY, double centrePositionZ);
 
 	~GaussianOrbital();
 
@@ -20,6 +20,8 @@ public:
 	int GetM();
 
 	int GetN();
+
+	double GetAlpha();
 
 	double GetPositionX();
 
@@ -57,7 +59,7 @@ private:
 
 	void Normalise();
 
-	double OverlapFunction(int l1, int l2, double posA, double posB);
+	double OverlapFunction(int l1, int l2, double gamma, double posA, double posB);
 
 	double NuclearFunction(int l, int r, int i, int l1, int l2, double pos1, double pos2, double pos3);
 
@@ -72,14 +74,13 @@ private:
 	GaussianOrbital ChangeN(int n) const;
 
 private:
-	unsigned int m_k;	// x quntum number of angular momentum
-	unsigned int m_m;	// y quntum number of angular momentum
-	unsigned int m_n;	// z quntum number of angular momentum
-
-	double m_centrePositionX;
-	double m_centrePositionY;
-	double m_centrePositionZ;
-	double m_normaliseConstant;
-
+	unsigned int m_k;			// x quntum number of angular momentum
+	unsigned int m_m;			// y quntum number of angular momentum
+	unsigned int m_n;			// z quntum number of angular momentum
+	double m_alpha;				// a factor in the exponetial (exp(ax^2))
+	double m_centrePositionX;	// x position of centre of gaussian
+	double m_centrePositionY;	// x position of centre of gaussian
+	double m_centrePositionZ;	// x position of centre of gaussian
+	double m_normaliseConstant;	// Factor to normilise the wavefunction
 };
 #endif
