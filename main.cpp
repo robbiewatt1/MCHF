@@ -17,9 +17,9 @@
 #include <cmath>
 int main()
 {
-	Vector<GaussianOrbital> orbitV(11);
+	Vector<GaussianOrbital> orbitV(1);
 
-	orbitV[0] = GaussianOrbital(0,0,0,0.0,0.0,0.0);
+	orbitV[0] = GaussianOrbital(1,1,1,1,0.0,0.0,0.0);
 /*
 	orbitV[1] = GaussianOrbital(1,0,0,0.0,0.0,0.0);
 	orbitV[2] = GaussianOrbital(0,1,0,0.0,0.0,0.0);
@@ -51,6 +51,6 @@ int main()
 	eigenVectors.Print();
 	eigenvalues.Print();
 */
-	std::cout << orbitV[0].KineticOverlap(orbitV[10]) << std::endl;
+	std::cout << orbitV[0].KineticOverlap(orbitV[0]) << std::endl;
 	return 0;
 }
