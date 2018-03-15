@@ -85,6 +85,7 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 	double plus2m  = this->Overlap(orbit.ChangeM(2));
 	double plus2n  = this->Overlap(orbit.ChangeN(2));
 	double minus2k(0), minus2M(0), minus2N(0);
+
 	if (orbit.m_k > 1)
 	{
 		minus2k = this->Overlap(orbit.ChangeK(-2));
@@ -98,12 +99,12 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 		minus2N = this->Overlap(orbit.ChangeN(-2));
 	}
 
-	double kinOverlap = normFactor * ((orbit.m_alpha * (2 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3) * overlap)
-	                                  - 2 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n)
-	                                  - 0.5 * (orbit.m_k * (orbit.m_k - 1) * minus2k
-	                                          + orbit.m_m * (orbit.m_m - 1) * minus2M
-	                                          + orbit.m_n * (orbit.m_n - 1) * minus2N));
-	return kinOverlap;
+	double kinOverlap = (orbit.m_alpha * (2 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3) * overlap)
+						- (2 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
+						- (0.5 * (orbit.m_k * (orbit.m_k - 1) * minus2k 
+							     + orbit.m_m * (orbit.m_m - 1) * minus2k
+							     + orbit.m_k * (orbit.m_k - 1) * minus2k));
+	return normFactor * kinOverlap;
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge, double nuclearX,
@@ -171,7 +172,7 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			}
 		}
 	}
-	return (-2 * Constants::pi * normFactor / gamma) * exponetialFactor * sum; // Not sure if it should be 2 or 1 here??
+	return (- 2 * Constants::pi * normFactor / gamma) * exponetialFactor * sum;
 }
 
 void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
@@ -238,8 +239,8 @@ double GaussianOrbital::OverlapFunction(int l1, int l2, double gamma, double pos
 	double sum(0);
 	for (int i = 0; i <= maxSum; i++)
 	{
-		sum += std::sqrt(Constants::pi / 2) * GaussianProduct(2 * i, l1, l2, posA, posB)
-		       * Functions::SemiFactorial(2 * i - 1) / std::pow(gamma, (2 * i + 1) / 2);
+		sum += std::sqrt(Constants::pi / gamma) * GaussianProduct(2 * i, l1, l2, posA, posB)
+		       * Functions::SemiFactorial(2 * i - 1) / std::pow(2 * gamma, i);
 	}
 	return sum;
 }
