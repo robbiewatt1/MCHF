@@ -104,7 +104,7 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 	                    - (0.5 * (orbit.m_k * (orbit.m_k - 1) * minus2K
 	                              + orbit.m_m * (orbit.m_m - 1) * minus2M
 	                              + orbit.m_n * (orbit.m_n - 1) * minus2N));
-	return kinOverlap * normFactor / std::pow(Constants::pi,2.5);
+	return kinOverlap * normFactor;
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge, double nuclearX,
