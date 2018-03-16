@@ -84,11 +84,11 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 	double plus2k  = this->Overlap(orbit.ChangeK(2));
 	double plus2m  = this->Overlap(orbit.ChangeM(2));
 	double plus2n  = this->Overlap(orbit.ChangeN(2));
-	double minus2k(0), minus2M(0), minus2N(0);
+	double minus2K(0), minus2M(0), minus2N(0);
 
 	if (orbit.m_k > 1)
 	{
-		minus2k = this->Overlap(orbit.ChangeK(-2));
+		minus2K = this->Overlap(orbit.ChangeK(-2));
 	}
 	if (orbit.m_m > 1)
 	{
@@ -100,11 +100,11 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 	}
 
 	double kinOverlap = (orbit.m_alpha * (2 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3) * overlap)
-						- (2 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
-						- (0.5 * (orbit.m_k * (orbit.m_k - 1) * minus2k 
-							     + orbit.m_m * (orbit.m_m - 1) * minus2k
-							     + orbit.m_k * (orbit.m_k - 1) * minus2k));
-	return normFactor * kinOverlap;
+	                    - (2 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
+	                    - (0.5 * (orbit.m_k * (orbit.m_k - 1) * minus2K
+	                              + orbit.m_m * (orbit.m_m - 1) * minus2M
+	                              + orbit.m_n * (orbit.m_n - 1) * minus2N));
+	return kinOverlap * normFactor / std::pow(Constants::pi,2.5);
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge, double nuclearX,
@@ -172,7 +172,7 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			}
 		}
 	}
-	return (- 2 * Constants::pi * normFactor / gamma) * exponetialFactor * sum;
+	return (-2 * Constants::pi / gamma) * exponetialFactor * sum * normFactor;
 }
 
 void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
