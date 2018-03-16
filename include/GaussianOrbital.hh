@@ -58,6 +58,7 @@ public:
 private:
 
 	void Normalise();
+	// Normalises the wavefunction, and sets the norm constant. uses the overlap of the orbit with itself 
 
 	double OverlapFunction(int l1, int l2, double gamma, double posA, double posB);
 

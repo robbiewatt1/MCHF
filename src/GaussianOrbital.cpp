@@ -58,10 +58,9 @@ double GaussianOrbital::GetNormaliseConstant()
 double GaussianOrbital::Overlap(const GaussianOrbital &orbit)
 {
 	double gamma  = m_alpha + orbit.m_alpha;
-
-	double posPx  = (m_centrePositionX + orbit.m_centrePositionX) / 2;
-	double posPy  = (m_centrePositionY + orbit.m_centrePositionY) / 2;
-	double posPz  = (m_centrePositionZ + orbit.m_centrePositionZ) / 2;
+	double posPx  = (m_centrePositionX * m_alpha + orbit.m_centrePositionX * orbit.m_alpha) / gamma;
+	double posPy  = (m_centrePositionY * m_alpha + orbit.m_centrePositionY * orbit.m_alpha) / gamma;
+	double posPz  = (m_centrePositionZ * m_alpha + orbit.m_centrePositionZ * orbit.m_alpha) / gamma;
 	double posAB2 = std::pow(orbit.m_centrePositionX - m_centrePositionX , 2.0)
 	                + std::pow(orbit.m_centrePositionY - m_centrePositionY , 2.0)
 	                + std::pow(orbit.m_centrePositionZ -  m_centrePositionZ, 2.0);
@@ -111,10 +110,9 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
                                        double nuclearY, double nuclearZ)
 {
 	double gamma  = m_alpha + orbit.m_alpha;
-
-	double posPx = (m_centrePositionX + orbit.m_centrePositionX) / 2;
-	double posPy = (m_centrePositionY + orbit.m_centrePositionY) / 2;
-	double posPz = (m_centrePositionZ + orbit.m_centrePositionZ) / 2;
+	double posPx  = (m_centrePositionX * m_alpha + orbit.m_centrePositionX * orbit.m_alpha) / gamma;
+	double posPy  = (m_centrePositionY * m_alpha + orbit.m_centrePositionY * orbit.m_alpha) / gamma;
+	double posPz  = (m_centrePositionZ * m_alpha + orbit.m_centrePositionZ * orbit.m_alpha) / gamma;
 	double posAB2 = std::pow(orbit.m_centrePositionX - m_centrePositionX , 2.0)
 	                + std::pow(orbit.m_centrePositionY - m_centrePositionY , 2.0)
 	                + std::pow(orbit.m_centrePositionZ -  m_centrePositionZ, 2.0);
@@ -172,20 +170,18 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			}
 		}
 	}
-	return (-2 * Constants::pi / gamma) * exponetialFactor * sum * normFactor;
+	return (-2 * Constants::pi / gamma) * exponetialFactor * sum * normFactor * nuclearCharge;
 }
 
 void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
         const Vector<double> &yAxis,
         const Vector<double> &zAxis)
 {
-	// Set the axis data;
 	SetXAxis(xAxis);
 	SetYAxis(yAxis);
 	SetZAxis(zAxis);
 	SetData(xAxis, yAxis, zAxis);
 
-	// Set the data array
 	for (int i = 0; i < xAxis.Length(); i++)
 	{
 		for (int j = 0; j < yAxis.Length(); j++)
