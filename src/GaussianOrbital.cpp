@@ -7,7 +7,7 @@
 #include "Array3D.hh"
 
 GaussianOrbital::GaussianOrbital():
-	m_k(1), m_m(1), m_n(1), m_alpha(1), m_centrePositionX(0), m_centrePositionY(0),
+	m_k(0), m_m(0), m_n(0), m_alpha(1), m_centrePositionX(0), m_centrePositionY(0),
 	m_centrePositionZ(0)
 {
 	Normalise();
