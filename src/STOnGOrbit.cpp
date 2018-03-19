@@ -18,7 +18,7 @@ STOnGOrbit::STOnGOrbit(std::string dataFile, int k, int m, int n, double centreP
 {
 	OpenDataFile(dataFile);
 	AllocateBaseOrbitals();
-	Normalise();				// Normalise here, although should already be normed
+	Normalise();
 }
 
 STOnGOrbit::~STOnGOrbit()
