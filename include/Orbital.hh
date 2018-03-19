@@ -53,9 +53,5 @@ protected:
 	Vector<double> m_xAxis;
 	Vector<double> m_yAxis;
 	Vector<double> m_zAxis;
-
-public:
-//	Orbital operator=(const Orbital &orbital);
-
 };
 #endif

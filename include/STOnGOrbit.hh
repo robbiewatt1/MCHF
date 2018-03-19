@@ -18,6 +18,8 @@ public:
 
 	~STOnGOrbit();
 
+	double GetNormaliseConstant();
+
 	GaussianOrbital GetBaseOribtal(int i) const;
 
 	double GetExponent(int i) const;
@@ -36,6 +38,17 @@ public:
 	                      double nuclearY, double nuclearZ);
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
+
+	void CalculateDataCartesian(const Vector<double> &xAxis,
+	                            const Vector<double> &yAxis,
+	                            const Vector<double> &zAxis) override;
+	// Calcultes the data for a cartesian grid
+
+	void CalculateDataSpherical(const Vector<double> &rAxis,
+	                            const Vector<double> &thetaAxis,
+	                            const Vector<double> &phiAxis) override;
+
+	// Calcultes the data for a spherical grid
 
 private:
 
