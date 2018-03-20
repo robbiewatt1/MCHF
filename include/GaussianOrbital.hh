@@ -62,12 +62,14 @@ private:
 
 	double OverlapFunction(int l1, int l2, double gamma, double posA, double posB);
 
-	double NuclearFunction(int l, int r, int i, int l1, int l2, double gamma, double pos1,
-	                       double pos2, double pos3);
+	double NuclearFunction(int l, int r, int i, int l1, int l2, double alpha, double beta,
+						   double pos1, double pos2, double pos3);
 
 	double GaussianProduct(int k, int l1, int l2, double pos1, double pos2);
 
 	double GaussianProduct2(int k, int l1, int l2, double pos1, double pos2);
+
+	double GaussianProduct3(int k, int l1, int l2, double pos1, double pos2);
 
 	GaussianOrbital ChangeK(int k) const;
 

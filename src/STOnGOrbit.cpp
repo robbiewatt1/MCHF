@@ -25,6 +25,21 @@ STOnGOrbit::~STOnGOrbit()
 {
 }
 
+int STOnGOrbit::GetK()
+{
+	return m_k;
+}
+
+int STOnGOrbit::GetM()
+{
+	return m_m;
+}
+
+int STOnGOrbit::GetN()
+{
+	return m_n;
+}
+
 double STOnGOrbit::GetNormaliseConstant()
 {
 	return m_normaliseConstant;

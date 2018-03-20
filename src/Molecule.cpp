@@ -2,6 +2,7 @@
 
 #include "Molecule.hh"
 #include "LinearAlgebra.hh"
+#include "STOnGOrbit.hh"
 
 Molecule::Molecule()
 {
@@ -16,7 +17,6 @@ Molecule::Molecule(const Vector<double> &nuclearCharges,
 
 Molecule::~Molecule()
 {
-
 }
 
 Vector<double> Molecule::GetEnergyLevels()
@@ -37,35 +37,43 @@ void Molecule::CalculateEnergy()
 	double potential(0);
 	for (int i = 0; i < m_nuclearCharges.Length(); i++)
 	{
-		for (int j = i + 1; j < m_nuclearCharges.Length(); j++ )
+		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
 		{
 			potential += CalculatePotential(m_nuclearCharges[i], m_nuclearCharges[j],
 			                                m_nuclearPositions[i], m_nuclearPositions[j]);
 		}
 	}
-
-	int ionIndex(0);
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
 		for (int j = 0; j < m_basisSet.Length(); j++)
 		{
-			energyMaxtrix[i][j] = (m_basisSet[i].KineticOverlap(m_basisSet[j])
-			                       + m_basisSet[i].NuclearOverlap(m_basisSet[j],
-			                               m_nuclearCharges[ionIndex],
-			                               m_nuclearPositions[ionIndex][0],
-			                               m_nuclearPositions[ionIndex][1],
-			                               m_nuclearPositions[ionIndex][2]))
-			                      * m_basisSet[i].GetNormaliseConstant()
-			                      * m_basisSet[j].GetNormaliseConstant()
-			                      + potential;
+			// loop over ion sights to get nuclear attraction integral
+			double nuclearPotential(0);
+			for (int k = 0; k < m_nuclearCharges.Length(); k++)
+			{
+				nuclearPotential += m_basisSet[i].NuclearOverlap(m_basisSet[j],
+									m_nuclearCharges[k],
+									m_nuclearPositions[k][0],
+									m_nuclearPositions[k][1],
+									m_nuclearPositions[k][2])
+								   * m_basisSet[j].GetNormaliseConstant()
+								   * m_basisSet[i].GetNormaliseConstant();
+			}
+			double kineticEnergy = m_basisSet[i].KineticOverlap(m_basisSet[j]) 
+								  * m_basisSet[i].GetNormaliseConstant()
+			                      * m_basisSet[j].GetNormaliseConstant();
 
+			energyMaxtrix[i][j] = kineticEnergy + potential + nuclearPotential;
+			std::cout << m_basisSet[j].GetNormaliseConstant() << std::endl;
 			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j])
 			                      * m_basisSet[i].GetNormaliseConstant()
 			                      * m_basisSet[j].GetNormaliseConstant();
-			ionIndex = (ionIndex + 1) % m_nuclearCharges.Length();
+			std::cout << nuclearPotential << " " << potential << " " << kineticEnergy << std::endl;
 		}
 	}
 
+	energyMaxtrix.Print();
+	overlapMatrix.Print();
 	m_energyLevels = Vector<double>(m_basisSet.Length());
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
@@ -84,7 +92,7 @@ void Molecule::SetBasisSet()
 				if (n + m + k <= m_maxL)
 				{
 					// Now loop over all ion sights
-					for (int i = 0; i < m_nuclearPositions.Length() ; ++i)
+					for (int i = 0; i < m_nuclearPositions.Length(); i++)
 					{
 						STOnGOrbit orbital = STOnGOrbit("./OrbitalData/STO3Test", k, m, n,
 						                                m_nuclearPositions[i][0],
@@ -103,6 +111,6 @@ double Molecule::CalculatePotential(int z1, int z2, Vector<double> ionLocation1,
 {
 	double ionR = std::sqrt(std::pow(ionLocation1[0] - ionLocation2[0], 2.0)
 	                        + std::pow(ionLocation1[1] - ionLocation2[1], 2.0)
-	                        + std::pow(ionLocation1[0] - ionLocation2[0], 2.0));
+	                        + std::pow(ionLocation1[2] - ionLocation2[2], 2.0));
 	return z1 * z2 / ionR;
 }

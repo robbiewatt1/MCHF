@@ -18,6 +18,12 @@ public:
 
 	~STOnGOrbit();
 
+	int GetK();
+
+	int GetM();
+
+	int GetN();
+
 	double GetNormaliseConstant();
 
 	GaussianOrbital GetBaseOribtal(int i) const;
