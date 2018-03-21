@@ -51,7 +51,6 @@ void Molecule::CalculateEnergy()
 			double nuclearPotential(0);
 			for (int k = 0; k < m_nuclearCharges.Length(); k++)
 			{
-				std::cout << k << std::endl;
 				nuclearPotential += m_basisSet[i].NuclearOverlap(m_basisSet[j],
 				                    m_nuclearCharges[k],
 				                    m_nuclearPositions[k])
@@ -62,10 +61,11 @@ void Molecule::CalculateEnergy()
 			                       * m_basisSet[i].GetNormaliseConstant()
 			                       * m_basisSet[j].GetNormaliseConstant();
 
-			energyMaxtrix[i][j] = kineticEnergy + potential + nuclearPotential;
 			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j])
 			                      * m_basisSet[i].GetNormaliseConstant()
 			                      * m_basisSet[j].GetNormaliseConstant();
+			energyMaxtrix[i][j] = kineticEnergy + (potential * overlapMatrix[i][j]) + nuclearPotential;
+
 		}
 	}
 	m_energyLevels = Vector<double>(m_basisSet.Length());
@@ -88,7 +88,7 @@ void Molecule::SetBasisSet()
 					// Now loop over all ion sights
 					for (int i = 0; i < m_nuclearPositions.Length(); i++)
 					{
-						STOnGOrbit orbital = STOnGOrbit("./OrbitalData/STO3Test", k, m, n,
+						STOnGOrbit orbital = STOnGOrbit("./OrbitalData/STO6Test", k, m, n,
 						                                m_nuclearPositions[i]);
 						m_basisSet.Append(orbital);
 					}
