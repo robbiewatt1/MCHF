@@ -172,13 +172,6 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 										int boysIndex = (k + m + n) - (2 * (r + s + t))
 										                - (i + j + l);
 										sum += Ax * Ay * Az * Functions::BoysFunction(boysIndex, gamma * posPC2);
-										//std::cout << Ax << "AX" << std::endl;
-										//std::cout << Ay << "Ay" << std::endl;
-										//std::cout << Az << "Az" << std::endl;
-										//std::cout << Functions::BoysFunction(boysIndex, gamma * posPC2) << "BF" << std::endl;
-										//std::cout << " BI" << boysIndex << std::endl;
-										//std::cout << " BA" << gamma * posPC2  << std::endl;
-										//std::cout << "RESULT " << Functions::BoysFunction(boysIndex, gamma * posPC2) << std::endl;
 									}
 								}
 							}
