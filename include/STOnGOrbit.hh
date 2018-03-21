@@ -13,8 +13,7 @@ public:
 
 	STOnGOrbit();
 
-	STOnGOrbit(std::string dataFile, int k, int m, int n, double centrePositionX,
-	           double centrePositionY, double centrePositionZ);
+	STOnGOrbit(std::string dataFile, int k, int m, int n, Vector<double> orbitPosition);
 
 	~STOnGOrbit();
 
@@ -40,8 +39,7 @@ public:
 	double KineticOverlap(const STOnGOrbit &orbit);
 	// Calculates the kinetic overlap of the two orbitals. This includes the -0.5
 
-	double NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, double nuclearX,
-	                      double nuclearY, double nuclearZ);
+	double NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, Vector<double> nuclearPosition);
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
 
@@ -70,9 +68,8 @@ private:
 	unsigned int m_k;			// x quntum number of angular momentum
 	unsigned int m_m;			// y quntum number of angular momentum
 	unsigned int m_n;			// z quntum number of angular momentum
-	double m_centrePositionX;	// x position of centre of gaussian
-	double m_centrePositionY;	// x position of centre of gaussian
-	double m_centrePositionZ;	// x position of centre of gaussian
+	Vector<double> m_orbitPosition;	// x position of centre of gaussian
+
 	double m_normaliseConstant;	// Factor to normilise the wavefunction
 	int m_gaussianNumber;
 

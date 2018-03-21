@@ -10,8 +10,7 @@ public:
 
 	GaussianOrbital();	// Default constructor
 
-	GaussianOrbital(int k, int m, int n, double alpha, double centrePositionX,
-	                double centrePositionY, double centrePositionZ);
+	GaussianOrbital(int k, int m, int n, double alpha, Vector<double> orbitPosition);
 
 	~GaussianOrbital();
 
@@ -39,8 +38,8 @@ public:
 	double KineticOverlap(const GaussianOrbital &orbit);
 	// Calculates the kinetic overlap of the two orbitals. This includes the -0.5
 
-	double NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge, double nuclearX,
-	                      double nuclearY, double nuclearZ);
+	double NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
+	                      Vector<double> nuclearPosition);
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
 
@@ -58,12 +57,12 @@ public:
 private:
 
 	void Normalise();
-	// Normalises the wavefunction, and sets the norm constant. uses the overlap of the orbit with itself 
+	// Normalises the wavefunction, and sets the norm constant. uses the overlap of the orbit with itself
 
 	double OverlapFunction(int l1, int l2, double gamma, double posA, double posB);
 
 	double NuclearFunction(int l, int r, int i, int l1, int l2, double alpha, double beta,
-						   double pos1, double pos2, double pos3);
+	                       double pos1, double pos2, double pos3);
 
 	double GaussianProduct(int k, int l1, int l2, double pos1, double pos2);
 
@@ -82,9 +81,7 @@ private:
 	unsigned int m_m;			// y quntum number of angular momentum
 	unsigned int m_n;			// z quntum number of angular momentum
 	double m_alpha;				// a factor in the exponetial (exp(ax^2))
-	double m_centrePositionX;	// x position of centre of gaussian
-	double m_centrePositionY;	// x position of centre of gaussian
-	double m_centrePositionZ;	// x position of centre of gaussian
+	Vector<double> m_orbitPosition;	// position of centre of gaussian
 	double m_normaliseConstant;	// Factor to normilise the wavefunction
 };
 #endif

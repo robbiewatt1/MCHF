@@ -7,15 +7,14 @@
 #include "GaussianOrbital.hh"
 
 STOnGOrbit::STOnGOrbit():
-	m_k(0), m_m(0), m_n(0), m_centrePositionX(0), m_centrePositionY(0), m_centrePositionZ(0)
+	m_k(0), m_m(0), m_n(0), m_orbitPosition(3)
 {
 }
 
-STOnGOrbit::STOnGOrbit(std::string dataFile, int k, int m, int n, double centrePositionX,
-                       double centrePositionY, double centrePositionZ):
-	m_k(k), m_m(m), m_n(n), m_centrePositionX(centrePositionX), m_centrePositionY(centrePositionY),
-	m_centrePositionZ(centrePositionZ)
+STOnGOrbit::STOnGOrbit(std::string dataFile, int k, int m, int n, Vector<double> orbitPosition):
+	m_k(k), m_m(m), m_n(n)
 {
+	m_orbitPosition = orbitPosition;
 	OpenDataFile(dataFile);
 	AllocateBaseOrbitals();
 	Normalise();
@@ -92,8 +91,7 @@ double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit)
 	return knieticEnergy;
 }
 
-double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, double nuclearX,
-								  double nuclearY, double nuclearZ)
+double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, Vector<double> nuclearPosition)
 {
 	double potentialEnergy(0);
 	for (int i = 0; i < m_gaussianNumber; i++)
@@ -101,7 +99,7 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, do
 		for (int j = 0; j < orbit.m_gaussianNumber; j++)
 		{
 			potentialEnergy += m_baseOrbitalVector[i].NuclearOverlap(orbit.GetBaseOribtal(j), 
-									nuclearCharge, nuclearX, nuclearY, nuclearZ)
+									nuclearCharge, nuclearPosition)
 							 * m_coefficeints[i] * orbit.m_coefficeints[j]
 							 * m_baseOrbitalVector[i].GetNormaliseConstant()
 							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
@@ -153,7 +151,6 @@ void STOnGOrbit::AllocateBaseOrbitals()
 {
 	for (int i = 0; i < m_gaussianNumber; i++)
 	{
-		m_baseOrbitalVector.Append(GaussianOrbital(m_k, m_m, m_n, m_exponents[i], m_centrePositionX,
-		                                       m_centrePositionY, m_centrePositionZ));
+		m_baseOrbitalVector.Append(GaussianOrbital(m_k, m_m, m_n, m_exponents[i], m_orbitPosition));
 	}
 }

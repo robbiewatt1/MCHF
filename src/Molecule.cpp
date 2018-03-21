@@ -51,33 +51,27 @@ void Molecule::CalculateEnergy()
 			double nuclearPotential(0);
 			for (int k = 0; k < m_nuclearCharges.Length(); k++)
 			{
+				std::cout << k << std::endl;
 				nuclearPotential += m_basisSet[i].NuclearOverlap(m_basisSet[j],
-									m_nuclearCharges[k],
-									m_nuclearPositions[k][0],
-									m_nuclearPositions[k][1],
-									m_nuclearPositions[k][2])
-								   * m_basisSet[j].GetNormaliseConstant()
-								   * m_basisSet[i].GetNormaliseConstant();
+				                    m_nuclearCharges[k],
+				                    m_nuclearPositions[k])
+				                    * m_basisSet[j].GetNormaliseConstant()
+				                    * m_basisSet[i].GetNormaliseConstant();
 			}
-			double kineticEnergy = m_basisSet[i].KineticOverlap(m_basisSet[j]) 
-								  * m_basisSet[i].GetNormaliseConstant()
-			                      * m_basisSet[j].GetNormaliseConstant();
+			double kineticEnergy = m_basisSet[i].KineticOverlap(m_basisSet[j])
+			                       * m_basisSet[i].GetNormaliseConstant()
+			                       * m_basisSet[j].GetNormaliseConstant();
 
 			energyMaxtrix[i][j] = kineticEnergy + potential + nuclearPotential;
-			std::cout << m_basisSet[j].GetNormaliseConstant() << std::endl;
 			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j])
 			                      * m_basisSet[i].GetNormaliseConstant()
 			                      * m_basisSet[j].GetNormaliseConstant();
-			std::cout << nuclearPotential << " " << potential << " " << kineticEnergy << std::endl;
 		}
 	}
-
-	energyMaxtrix.Print();
-	overlapMatrix.Print();
 	m_energyLevels = Vector<double>(m_basisSet.Length());
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
-		m_energyLevels);
+	                                      m_energyLevels);
 }
 
 void Molecule::SetBasisSet()
@@ -95,9 +89,7 @@ void Molecule::SetBasisSet()
 					for (int i = 0; i < m_nuclearPositions.Length(); i++)
 					{
 						STOnGOrbit orbital = STOnGOrbit("./OrbitalData/STO3Test", k, m, n,
-						                                m_nuclearPositions[i][0],
-						                                m_nuclearPositions[i][1],
-						                                m_nuclearPositions[i][2]);
+						                                m_nuclearPositions[i]);
 						m_basisSet.Append(orbital);
 					}
 				}
