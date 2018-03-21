@@ -7,17 +7,15 @@
 #include "Array3D.hh"
 
 GaussianOrbital::GaussianOrbital():
-	m_k(1), m_m(1), m_n(1), m_alpha(1), m_centrePositionX(0), m_centrePositionY(0),
-	m_centrePositionZ(0)
+	m_k(0), m_m(0), m_n(0), m_alpha(1), m_orbitPosition(3)
 {
 	Normalise();
 }
 
-GaussianOrbital::GaussianOrbital(int k, int m, int n, double alpha, double centrePositionX,
-                                 double centrePositionY, double centrePositionZ):
-	m_k(k), m_m(m), m_n(n), m_alpha(alpha), m_centrePositionX(centrePositionX),
-	m_centrePositionY(centrePositionY), m_centrePositionZ(centrePositionZ)
+GaussianOrbital::GaussianOrbital(int k, int m, int n, double alpha, Vector<double> orbitPosition):
+	m_k(k), m_m(m), m_n(n), m_alpha(alpha)
 {
+	m_orbitPosition = orbitPosition;
 	Normalise();
 }
 
@@ -47,7 +45,7 @@ double GaussianOrbital::GetAlpha()
 
 double GaussianOrbital::GetPositionX()
 {
-	return m_centrePositionX;
+	return m_orbitPosition[0];
 }
 
 double GaussianOrbital::GetNormaliseConstant()
@@ -58,19 +56,23 @@ double GaussianOrbital::GetNormaliseConstant()
 double GaussianOrbital::Overlap(const GaussianOrbital &orbit)
 {
 	double gamma  = m_alpha + orbit.m_alpha;
-	double posPx  = (m_centrePositionX * m_alpha + orbit.m_centrePositionX * orbit.m_alpha) / gamma;
-	double posPy  = (m_centrePositionY * m_alpha + orbit.m_centrePositionY * orbit.m_alpha) / gamma;
-	double posPz  = (m_centrePositionZ * m_alpha + orbit.m_centrePositionZ * orbit.m_alpha) / gamma;
-	double posAB2 = std::pow(orbit.m_centrePositionX - m_centrePositionX , 2.0)
-	                + std::pow(orbit.m_centrePositionY - m_centrePositionY , 2.0)
-	                + std::pow(orbit.m_centrePositionZ -  m_centrePositionZ, 2.0);
+	Vector<double> positionP(3);
+	positionP[0] = ((m_orbitPosition[0] * m_alpha) + (orbit.m_orbitPosition[0] * orbit.m_alpha))
+	               / gamma;
+	positionP[1] = ((m_orbitPosition[1] * m_alpha) + (orbit.m_orbitPosition[1] * orbit.m_alpha))
+	               / gamma;
+	positionP[2] = ((m_orbitPosition[2] * m_alpha) + (orbit.m_orbitPosition[2] * orbit.m_alpha))
+	               / gamma;
+	double posAB2 = std::pow(orbit.m_orbitPosition[0] - m_orbitPosition[0], 2.0)
+	                + std::pow(orbit.m_orbitPosition[1] - m_orbitPosition[1], 2.0)
+	                + std::pow(orbit.m_orbitPosition[2] - m_orbitPosition[2], 2.0);
 
-	double overlapX = OverlapFunction(m_k, orbit.m_k, gamma, m_centrePositionX - posPx,
-	                                  orbit.m_centrePositionX - posPx);
-	double overlapY = OverlapFunction(m_m, orbit.m_m, gamma, m_centrePositionY - posPy,
-	                                  orbit.m_centrePositionY - posPy);
-	double overlapZ = OverlapFunction(m_n, orbit.m_n, gamma, m_centrePositionZ - posPz,
-	                                  orbit.m_centrePositionZ - posPz);
+	double overlapX = OverlapFunction(m_k, orbit.m_k, gamma, m_orbitPosition[0] - positionP[0],
+	                                  orbit.m_orbitPosition[0] - positionP[0]);
+	double overlapY = OverlapFunction(m_m, orbit.m_m, gamma, m_orbitPosition[1] - positionP[1],
+	                                  orbit.m_orbitPosition[1] - positionP[1]);
+	double overlapZ = OverlapFunction(m_n, orbit.m_n, gamma, m_orbitPosition[2] - positionP[2],
+	                                  orbit.m_orbitPosition[2] - positionP[2]);
 	double overlap = std::exp(-1 * m_alpha * orbit.m_alpha * posAB2 / gamma)
 	                 * overlapX * overlapY * overlapZ;
 	return overlap;
@@ -78,7 +80,7 @@ double GaussianOrbital::Overlap(const GaussianOrbital &orbit)
 
 double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 {
-	double normFactor = m_normaliseConstant * orbit.m_normaliseConstant;
+//	double normFactor = m_normaliseConstant * orbit.m_normaliseConstant;
 	double overlap = this->Overlap(orbit);
 	double plus2k  = this->Overlap(orbit.ChangeK(2));
 	double plus2m  = this->Overlap(orbit.ChangeM(2));
@@ -98,29 +100,33 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 		minus2N = this->Overlap(orbit.ChangeN(-2));
 	}
 
-	double kinOverlap = (orbit.m_alpha * (2 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3) * overlap)
-	                    - (2 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
-	                    - (0.5 * (orbit.m_k * (orbit.m_k - 1) * minus2K
-	                              + orbit.m_m * (orbit.m_m - 1) * minus2M
-	                              + orbit.m_n * (orbit.m_n - 1) * minus2N));
-	return kinOverlap * normFactor;
+	double kinOverlap = (orbit.m_alpha * (2.0 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3.0) * overlap)
+	                    - (2.0 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
+	                    - (0.5 * (orbit.m_k * (orbit.m_k - 1.0) * minus2K
+	                              + orbit.m_m * (orbit.m_m - 1.0) * minus2M
+	                              + orbit.m_n * (orbit.m_n - 1.0) * minus2N));
+	return kinOverlap;
 }
 
-double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge, double nuclearX,
-                                       double nuclearY, double nuclearZ)
+double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
+                                       Vector<double> nuclearPosition)
 {
 	double gamma  = m_alpha + orbit.m_alpha;
-	double posPx  = (m_centrePositionX * m_alpha + orbit.m_centrePositionX * orbit.m_alpha) / gamma;
-	double posPy  = (m_centrePositionY * m_alpha + orbit.m_centrePositionY * orbit.m_alpha) / gamma;
-	double posPz  = (m_centrePositionZ * m_alpha + orbit.m_centrePositionZ * orbit.m_alpha) / gamma;
-	double posAB2 = std::pow(orbit.m_centrePositionX - m_centrePositionX , 2.0)
-	                + std::pow(orbit.m_centrePositionY - m_centrePositionY , 2.0)
-	                + std::pow(orbit.m_centrePositionZ -  m_centrePositionZ, 2.0);
-	double posPC2 = std::pow(nuclearX - posPx, 2) + std::pow(nuclearY - posPy, 2)
-	                + std::pow(nuclearZ - posPz, 2);
+	Vector<double> positionP(3);
+	positionP[0] = ((m_orbitPosition[0] * m_alpha) + (orbit.m_orbitPosition[0] * orbit.m_alpha))
+	               / gamma;
+	positionP[1] = ((m_orbitPosition[1] * m_alpha) + (orbit.m_orbitPosition[1] * orbit.m_alpha))
+	               / gamma;
+	positionP[2] = ((m_orbitPosition[2] * m_alpha) + (orbit.m_orbitPosition[2] * orbit.m_alpha))
+	               / gamma;
+	double posAB2 = std::pow(orbit.m_orbitPosition[0] - m_orbitPosition[0], 2.0)
+	                + std::pow(orbit.m_orbitPosition[1] - m_orbitPosition[1], 2.0)
+	                + std::pow(orbit.m_orbitPosition[2] - m_orbitPosition[2], 2.0);
+	double posPC2 = std::pow(nuclearPosition[0] - positionP[0], 2.0)
+	                + std::pow(nuclearPosition[1] - positionP[1], 2.0)
+	                + std::pow(nuclearPosition[2] - positionP[2], 2.0);
 
 	double exponetialFactor = std::exp(-1 * m_alpha * orbit.m_alpha * posAB2 / gamma);
-	double normFactor = m_normaliseConstant * orbit.m_normaliseConstant;
 
 	double sum(0);
 	int maxK = m_k + orbit.m_k;
@@ -134,8 +140,9 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			int maxI = (k - 2 * r) / 2;
 			for (int i = 0; i <= maxI; i++)
 			{
-				double Ax = NuclearFunction(k, r, i, m_k, orbit.m_k, gamma, m_centrePositionX,
-				                            orbit.m_centrePositionX, nuclearX);
+				double Ax = NuclearFunction(k, r, i, m_k, orbit.m_k, m_alpha, orbit.m_alpha,
+				                            m_orbitPosition[0], orbit.m_orbitPosition[0],
+				                            nuclearPosition[0]);
 				for (int m = 0; m <= maxM; m++)
 				{
 					int maxS = m / 2;
@@ -144,9 +151,10 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 						int maxJ = (m - 2 * s) / 2;
 						for (int j = 0; j <= maxJ; j++)
 						{
-							double Ay = NuclearFunction(m, s, j, m_m, orbit.m_m, gamma,
-							                            m_centrePositionY, orbit.m_centrePositionY,
-							                            nuclearY);
+							double Ay = NuclearFunction(m, s, j, m_m, orbit.m_m, m_alpha,
+							                            orbit.m_alpha, m_orbitPosition[1],
+							                            orbit.m_orbitPosition[1],
+							                            nuclearPosition[1]);
 							for (int n = 0; n <= maxN; n++)
 							{
 								int maxT = n / 2;
@@ -156,10 +164,13 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 									for (int  l = 0; l <= maxL; l++)
 									{
 										double Az = NuclearFunction(n, t, l,
-										                            m_n, orbit.m_n, gamma,
-										                            m_centrePositionZ, orbit.m_centrePositionZ,
-										                            nuclearZ);
-										int boysIndex = (k + m + n) - (2 * (r + s + t)) - (i + j + l);
+										                            m_n, orbit.m_n, m_alpha,
+										                            orbit.m_alpha,
+										                            m_orbitPosition[2],
+										                            orbit.m_orbitPosition[2],
+										                            nuclearPosition[2]);
+										int boysIndex = (k + m + n) - (2 * (r + s + t))
+										                - (i + j + l);
 										sum += Ax * Ay * Az * Functions::BoysFunction(boysIndex, gamma * posPC2);
 									}
 								}
@@ -170,7 +181,7 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			}
 		}
 	}
-	return (-2 * Constants::pi / gamma) * exponetialFactor * sum * normFactor * nuclearCharge;
+	return (-2 * Constants::pi / gamma) * exponetialFactor * sum * nuclearCharge;
 }
 
 void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
@@ -218,7 +229,7 @@ void GaussianOrbital::CalculateDataSpherical(const Vector<double> &rAxis,
 				                   * std::pow(std::cos(thetaAxis(j)), m_n)
 				                   * std::pow(std::cos(phiAxis(k)), m_k)
 				                   * std::pow(std::sin(phiAxis(k)), m_m)
-				                   * std::exp(-1 * m_alpha * std::pow(rAxis(i), 2.0));
+				                   * std::exp(-1.0 * m_alpha * std::pow(rAxis(i), 2.0));
 			}
 		}
 	}
@@ -235,35 +246,36 @@ double GaussianOrbital::OverlapFunction(int l1, int l2, double gamma, double pos
 	double sum(0);
 	for (int i = 0; i <= maxSum; i++)
 	{
-		sum += std::sqrt(Constants::pi / gamma) * GaussianProduct(2 * i, l1, l2, posA, posB)
-		       * Functions::SemiFactorial(2 * i - 1) / std::pow(2 * gamma, i);
+		sum += GaussianProduct(2 * i, l1, l2, posA, posB) * Functions::SemiFactorial(2 * i - 1)
+		       / std::pow(2.0 * gamma, i);
 	}
-	return sum;
+	return std::sqrt(Constants::pi / gamma) * sum;
 }
 
-double GaussianOrbital::NuclearFunction(int l, int r, int i, int l1, int l2, double gamma,
-                                        double posA, double posB, double posC)
+double GaussianOrbital::NuclearFunction(int l, int r, int i, int l1, int l2, double alpha,
+                                        double beta, double posA, double posB, double posC)
 {
-	double epsilon = 1 / (4 * gamma);
-	double posP = (posA + posB) / 2;
-	double result = std::pow(-1, l) * GaussianProduct(l, l1, l2, posA - posP, posB - posP) * std::pow(-1, i)
+	double gamma = alpha + beta;
+	double epsilon = 1.0 / (4.0 * gamma);
+	double posP = (posA * alpha + posB * beta) / gamma;
+	double result = std::pow(-1, l) * GaussianProduct(l, l1, l2, posA - posP, posB - posP) * std::pow(-1.0, i)
 	                * Functions::Factorial(l) * std::pow(posC - posP, l - 2 * r - 2 * i)
 	                * std::pow(epsilon, r + i) / (Functions::Factorial(r) * Functions::Factorial(i)
 	                        * Functions::Factorial(l - (2 * r) - (2 * i)));
 	return result;
 }
 
-double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2)
+double GaussianOrbital::GaussianProduct3(int k, int l1, int l2, double pos1, double pos2)
 {
 	int maxSum = std::min(k, 2 * l1 - k);
 	int minSum = std::max(-k, k - 2 * l2);
 	double sum(0);
-	for (int i = minSum; i <= maxSum; i = i + 2)
+	for (int q = minSum; q <= maxSum; q = q + 2)
 	{
-		int q = (k + i) / 2;
-		int p = (k - i) / 2;
-		sum += Functions::BinomialCoefficient(l1, q) * Functions::BinomialCoefficient(l2, p)
-		       * std::pow(pos1, l1 - q) * std::pow(pos2, l2 - p);
+		int i = (k + q) / 2;
+		int j = (k - q) / 2;
+		sum += Functions::BinomialCoefficient(l1, i) * Functions::BinomialCoefficient(l2, j)
+		       * std::pow(pos1, l1 - i) * std::pow(pos2, l2 - j);
 	}
 	return sum;
 }
@@ -282,23 +294,33 @@ double GaussianOrbital::GaussianProduct2(int k, int l1, int l2, double pos1, dou
 	return sum;
 }
 
+double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2)
+{
+	double sum(0);
+	int minSum = std::max(0, k - l2);
+	int maxSum = std::min(k, l1);
+	for (int i = minSum; i <= maxSum ; i++)
+	{
+		sum += Functions::BinomialCoefficient(l1, i) * Functions::BinomialCoefficient(l2, k - i)
+		       * std::pow(pos1, l1 - i) * std::pow(pos2, l2 + i - k);
+	}
+	return sum;
+}
+
 GaussianOrbital GaussianOrbital::ChangeK(int k) const
 {
-	GaussianOrbital orbit(m_k + k, m_m, m_n, m_alpha, m_centrePositionX, m_centrePositionY,
-	                      m_centrePositionZ);
+	GaussianOrbital orbit(m_k + k, m_m, m_n, m_alpha, m_orbitPosition);
 	return orbit;
 }
 
 GaussianOrbital GaussianOrbital::ChangeM(int m) const
 {
-	GaussianOrbital orbit(m_k, m_m + m, m_n, m_alpha, m_centrePositionX, m_centrePositionY,
-	                      m_centrePositionZ);
+	GaussianOrbital orbit(m_k, m_m + m, m_n, m_alpha, m_orbitPosition);
 	return orbit;
 }
 
 GaussianOrbital GaussianOrbital::ChangeN(int n) const
 {
-	GaussianOrbital orbit(m_k, m_m, m_n + n, m_alpha,
-	                      m_centrePositionX, m_centrePositionY, m_centrePositionZ);
+	GaussianOrbital orbit(m_k, m_m, m_n + n, m_alpha, m_orbitPosition);
 	return orbit;
 }

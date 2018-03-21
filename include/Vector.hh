@@ -113,6 +113,13 @@ public:
 		return m_data[elementIndex];
 	}
 
+	// returns the value of the vector at elementIndex. This method does not allow data to be editted
+	T& operator[](const int elementIndex) const
+	{
+		assert(elementIndex >= 0 && elementIndex < m_nElements);
+		return m_data[elementIndex];
+	}
+
 	// Copy vecotor to new vector
 	Vector<T>& operator=(const Vector<T> &vector)
 	{

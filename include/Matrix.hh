@@ -96,7 +96,7 @@ class Matrix
 			{
 				for(int j = 0; j < m_nColumn; j++)
 				{
-					std::cout << std::fixed << std::setprecision(5) << m_data[i][j] << ", ";
+					std::cout << std::fixed << std::setprecision(12) << m_data[i][j] << ", ";
 				}
 				if(i < m_nRow -1)
 				{
