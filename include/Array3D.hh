@@ -178,35 +178,29 @@ public:
 		return *this;
 	}
 
-	/*
+	
 		//array-array operations:
-		friend Array3D<T> operator+(const Array3D<T> &array1, const Array3D<T> &array2)
+	friend Array3D<T> operator+(const Array3D<T> &array1, const Array3D<T> &array2)
+	{
+		assert(array1.m_nElementsX == array2.m_nElementsX);
+		assert(array1.m_nElementsY == array2.m_nElementsY);
+		assert(array1.m_nElementsZ == array2.m_nElementsZ);
+
+		Array3D<T> newArray = Array3D<T>(array1.m_nElementsX, array1.m_nElementsY, array1.m_nElementsZ);
+
+		for (int i = 0; i < array1.m_nElementsX; i++)
 		{
-			assert(array1.m_nElementsX == array2.m_nElementsX);
-			assert(array1.m_nElementsY == array2.m_nElementsY);
-			assert(array1.m_nElementsZ == array2.m_nElementsZ);
-
-			Array3D<T> newArray = Array3D<T>(array1.m_nElements);
-
-			for (int i = 0; i < vector1.m_nElements; i++)
+			for (int j = 0; j < array1.m_nElementsY; j++)
 			{
-				newVector(i) = vector1.m_data[i] + vector2.m_data[i];
+				for (int k = 0; k < array1.m_nElementsZ; k++)
+				{
+					newArray[i][j][k] = array1[i][j][k] + array2[i][j][k];
+				}
 			}
-			return newVector;
-		};
+		}
+		return newArray;
+	};
 
-		friend Vector<T> operator-(const Vector<T> &vector1, const Vector<T> &vector2)
-		{
-			assert(vector1.m_nElements == vector2.m_nElements);
-			Vector<T> newVector = Vector<T>(vector1.m_nElements);
-
-			for (int i = 0; i < vector1.m_nElements; i++)
-			{
-				newVector(i) = vector1.m_data[i] - vector2.m_data[i];
-			}
-			return newVector;
-		};
-	*/
 	friend Array3D<T> operator*(const Array3D<T> &array1, const Array3D<T> &array2)
 	{
 		Array3D<T> newArray = Array3D<T>(array1.m_nElementsX, array1.m_nElementsY, array1.m_nElementsZ);
@@ -223,6 +217,21 @@ public:
 		}
 		return newArray;
 	};
+
+/*
+		friend Vector<T> operator-(const Vector<T> &vector1, const Vector<T> &vector2)
+		{
+			assert(vector1.m_nElements == vector2.m_nElements);
+			Vector<T> newVector = Vector<T>(vector1.m_nElements);
+
+			for (int i = 0; i < vector1.m_nElements; i++)
+			{
+				newVector(i) = vector1.m_data[i] - vector2.m_data[i];
+			}
+			return newVector;
+		};
+*/	
+
 	/*
 		friend Vector<T> operator/(const Vector<T> &vector1, const Vector<T> &vector2)
 		{

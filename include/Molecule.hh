@@ -17,10 +17,13 @@ public:
 	~Molecule();
 
 	Vector<double> GetEnergyLevels();
+	// Returns the energy level vector
 
 	Matrix<double> GetBasisCoefficients();
+	// Returns a matrix whoes collumns are the 
 
-	void CalculateEnergy();
+	void OutputWavefunction(); 
+	// This is just a quick fix for just now. Will write a proper output class at some point
 
 private:
 
@@ -30,6 +33,8 @@ private:
 	double CalculatePotential(int z1, int z2, Vector<double> ionLocation1,
 	                    	Vector<double> ionLocation2);
 	// Calculate the potential due to two ions
+
+	void CalculateEnergy();
 
 private:
 

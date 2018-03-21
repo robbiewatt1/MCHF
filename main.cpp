@@ -33,11 +33,22 @@ int main()
 	for(int i = 0; i < 100; i++)
 	{
 		positions[0][0] = 10.0 * (i /50.0);
-		
-		positions[0].Print();
-		Molecule a = Molecule(charges, positions, 3);
-		a.CalculateEnergy();
-		outfile << positions[0][0] << "\t" << a.GetEnergyLevels()[0] << "\t" << a.GetEnergyLevels()[1] << "\n";
+		Molecule a = Molecule(charges, positions, 4);
+		outfile << positions[0][0] << "\t" << a.GetEnergyLevels()[0] << "\t" << a.GetEnergyLevels()[1] << "\t" << a.GetEnergyLevels()[2] << "\n";
+		std::cout << a.GetEnergyLevels()[0] << std::endl;
 	}
+/*
+	Vector<double> xaxis(100), yaxis(100), zaxis(100);
+	for(int i = 0; i < 100; i++)
+	{
+		xaxis[i] = (10.0 * i / 100.0) -5.0;
+		yaxis[i] = (10.0 * i / 100.0) -5.0;
+		zaxis[i] = (10.0 * i / 100.0) -5.0;
+	}
+
+	STOnGOrbit test = STOnGOrbit("./OrbitalData/STO6Test", 0, 0,0,pos1);
+	test.CalculateDataCartesian(xaxis,yaxis,zaxis);
+	test.OutputData();
 	return 0;
+*/
 }

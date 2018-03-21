@@ -13,6 +13,7 @@ Molecule::Molecule(const Vector<double> &nuclearCharges,
 	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
 {
 	SetBasisSet();
+	CalculateEnergy();
 }
 
 Molecule::~Molecule()
@@ -73,6 +74,7 @@ void Molecule::CalculateEnergy()
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
 	                                      m_energyLevels);
 }
+
 
 void Molecule::SetBasisSet()
 {
