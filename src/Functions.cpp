@@ -5,10 +5,10 @@
 #include "Functions.hh"
 #include "Constants.hh"
 
-unsigned int Functions::Factorial(int n)
+double Functions::Factorial(double n)
 {
 	assert(n >= 0);
-	int factorial = 1;
+	double factorial = 1;
 	if (n > 1)
 	{
 		for (int i = 0; i < n; ++i)
@@ -19,9 +19,9 @@ unsigned int Functions::Factorial(int n)
 	return factorial;
 }
 
-unsigned int Functions::SemiFactorial(int n)
+double Functions::SemiFactorial(double n)
 {
-	int semiFactorial = 1;
+	double semiFactorial = 1;
 	if (n > 1)
 	{
 		for (int i = n; i > 1; i -= 2)
@@ -57,7 +57,7 @@ double Functions::ErrorFunction(double x)
 	if (x < 0)
 	{
 		parity = -1.0;
-		x = std::abs(x);	
+		x = std::abs(x);
 	}
 	double a1 = 0.254829592;
 	double a2 = -0.284496736;
@@ -66,7 +66,7 @@ double Functions::ErrorFunction(double x)
 	double a5 = 1.061405429;
 	double p  = 0.3275911;
 	double t = 1.0/(1.0 + (p * x));
-	double erf = parity* (1 - ((a1 * t) + (a2 * std::pow(t, 2.0)) + (a3 * std::pow(t, 3.0)) + (a4 * std::pow(t, 4.0)) 
+	double erf = parity * (1 - ((a1 * t) + (a2 * std::pow(t, 2.0)) + (a3 * std::pow(t, 3.0)) + (a4 * std::pow(t, 4.0)) 
 				 + (a5 * std::pow(t, 5.0))) * std::exp(- (x * x)));
 	return erf;
 }
@@ -76,13 +76,13 @@ double Functions::BoysFunction(int v, double u)
 	double result(0);
 	if(u > 0.025)
 	{
-		double factor1 = Factorial(2 * v) / (2.0 *  Factorial(v));
+		double factor1 = Factorial(2.0 * v) / (2.0 *  Factorial(v));
 		double factor2 = std::sqrt(Constants::pi) * ErrorFunction(std::sqrt(u))
 	                 / (std::pow(4.0, v) * std::pow(u, v + 0.5));
 		double sum(0);
 		for (int i = 0; i < v; i++)
 		{
-			sum += Factorial(v - i) / (std::pow(4.0, i) * (Factorial(2 * v - 2 * i))
+			sum += Factorial(1.0 * v - i) / (std::pow(4.0, i) * (Factorial(2.0 * v - 2.0 * i))
 		   	                                   * std::pow(u, i + 1.0));
 		}
 		result = factor1 * ( factor2 - std::exp(-1.0 * u) * sum);

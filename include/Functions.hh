@@ -3,11 +3,11 @@
 
 namespace Functions
 {
-	unsigned int Factorial(int n);
 	// Returns the factoriaol of int n
+	double Factorial(double n);
 
-	unsigned int SemiFactorial(int n);
 	// Returns the seminfactorial of int n
+	double SemiFactorial(double n);
 
 	unsigned int Gamma(int n);
 	// Returns the gamma function for an interger

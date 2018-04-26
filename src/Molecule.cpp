@@ -64,12 +64,14 @@ void Molecule::CalculateEnergy()
 			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j])
 			                      * m_basisSet[i].GetNormaliseConstant()
 			                      * m_basisSet[j].GetNormaliseConstant();
-			energyMaxtrix[i][j] = kineticEnergy + (potential * overlapMatrix[i][j]) + nuclearPotential;
-
+			//energyMaxtrix[i][j] = kineticEnergy + (potential * overlapMatrix[i][j]) + nuclearPotential;
+			energyMaxtrix[i][j] = nuclearPotential;
 		}
 	}
 	m_energyLevels = Vector<double>(m_basisSet.Length());
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
+	energyMaxtrix.Print();
+	overlapMatrix.Print();
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
 	                                      m_energyLevels);
 }
