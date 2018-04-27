@@ -1,5 +1,5 @@
 #include <cmath>
-
+#include <omp.h>
 #include "Molecule.hh"
 #include "LinearAlgebra.hh"
 #include "STOnGOrbit.hh"
@@ -43,10 +43,13 @@ void Molecule::CalculateEnergy()
 			                                m_nuclearPositions[i], m_nuclearPositions[j]);
 		}
 	}
+	#pragma omp parallel for
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
-		for (int j = 0; j < m_basisSet.Length(); j++)
+		for (int j = i; j < m_basisSet.Length(); j++)
 		{
+			//Check omp is working
+			//std::cout << "\n" << omp_get_thread_num() << "/" << omp_get_num_threads();
 			// loop over ion sights to get nuclear attraction integral
 			double nuclearPotential(0);
 			for (int k = 0; k < m_nuclearCharges.Length(); k++)
@@ -64,8 +67,11 @@ void Molecule::CalculateEnergy()
 			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j])
 			                      * m_basisSet[i].GetNormaliseConstant()
 			                      * m_basisSet[j].GetNormaliseConstant();
-			//energyMaxtrix[i][j] = kineticEnergy + (potential * overlapMatrix[i][j]) + nuclearPotential;
-			energyMaxtrix[i][j] = nuclearPotential;
+			energyMaxtrix[i][j] = kineticEnergy + (potential * overlapMatrix[i][j]) + nuclearPotential;
+			
+			// Matrix is symetric
+			overlapMatrix[j][i] = overlapMatrix[i][j];
+			energyMaxtrix[j][i] = energyMaxtrix[i][j];
 		}
 	}
 	m_energyLevels = Vector<double>(m_basisSet.Length());

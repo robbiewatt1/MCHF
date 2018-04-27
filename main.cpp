@@ -41,13 +41,10 @@ int main()
 		std::cout << a.GetEnergyLevels()[0] << std::endl;
 	}
 */
-/*
-	Molecule a = Molecule(charges, positions, 5);
+	Molecule a = Molecule(charges, positions, 4);
 	a.CalculateEnergy();
 	a.GetEnergyLevels().Print();
 
-*/
-	std::cout << Functions::BoysFunction(8,20) << std::endl;
 	
 	return 0;
 
