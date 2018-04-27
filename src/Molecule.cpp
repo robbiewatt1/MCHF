@@ -35,6 +35,7 @@ void Molecule::CalculateEnergy()
 	Matrix<double> overlapMatrix(m_basisSet.Length(), m_basisSet.Length());
 
 	double potential(0);
+	#pragma omp parallel for
 	for (int i = 0; i < m_nuclearCharges.Length(); i++)
 	{
 		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
@@ -76,8 +77,6 @@ void Molecule::CalculateEnergy()
 	}
 	m_energyLevels = Vector<double>(m_basisSet.Length());
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
-	energyMaxtrix.Print();
-	overlapMatrix.Print();
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
 	                                      m_energyLevels);
 }

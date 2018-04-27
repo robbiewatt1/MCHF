@@ -74,7 +74,7 @@ double Functions::ErrorFunction(double x)
 double Functions::BoysFunction(int v, double u)
 {
 	double result(0);
-	if(u > 0.25) // Check this number
+	if(u > 0.1) // Check this number
 	{
 		double factor1 = Factorial(2.0 * v) / (2.0 *  Factorial(v));
 		double factor2 = std::sqrt(Constants::pi) * ErrorFunction(std::sqrt(u))

@@ -22,6 +22,12 @@ public:
 
 	void CalculateEnergy();
 
+	void SetXAxis(const Vector<double> &xAxis);
+
+	void SetYAxis(const Vector<double> &yAxis);
+
+	void SetZAxis(const Vector<double> &zAxis);
+
 private:
 
 	void SetBasisSet();
