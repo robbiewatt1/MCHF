@@ -6,4 +6,5 @@ CMakeLists.txt
 MO
 OutputData
 *.dat
+*.h5
 OutputData/

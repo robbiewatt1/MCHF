@@ -131,37 +131,3 @@ void Orbital::OutputData()
 	delete dataset;
 	delete file;
 }
-
-
-/*
-Orbital Orbital::operator=(const Orbital &orbital)
-{
-	// self assigment guard
-	if(this == &orbital)
-	{
-		return *this;
-	}
-
-	delete[] m_data;
-
-	m_xAxis = orbital.m_xAxis;
-	m_yAxis = orbital.m_yAxis;
-	m_zAxis = orbital.m_zAxis;
-	if (orbital.m_data)
-	{
-		m_data = new double **[m_xAxis.Length()];
-		for (int i = 0; i < m_xAxis.Length(); i++)
-		{
-			m_data[i] = new double *[m_yAxis.Length()];
-			for (int j = 0; j < m_yAxis.Length(); j++)
-			 {
-			 	m_data[i][j] = new double [m_zAxis.Length()];
-			 }
-		}
-	} else
-	{
-		m_data = 0;
-	}
-	return *this;
-}
-*/

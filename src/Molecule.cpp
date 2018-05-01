@@ -3,6 +3,7 @@
 #include "Molecule.hh"
 #include "LinearAlgebra.hh"
 #include "STOnGOrbit.hh"
+#include "Numerics.hh"
 
 Molecule::Molecule()
 {
@@ -79,6 +80,66 @@ void Molecule::CalculateEnergy()
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
 	                                      m_energyLevels);
+}
+
+Array3D<double> Molecule::CalculateWavefunction(int level)
+{
+	if (m_xAxis.Length() == 0)
+	{
+		std::cerr << "Error: xAxis must be set using SetXAxis() function" << std::endl;
+	} else if (m_yAxis.Length() == 0)
+	{
+		std::cerr << "Error: yAxis must be set using SetXAxis() function" << std::endl;
+	} else if (m_zAxis.Length() == 0)
+	{
+		std::cerr << "Error: zAxis must be set using SetXAxis() function" << std::endl;
+	}
+	Array3D<double> wavefunction = Array3D<double>(m_xAxis.Length(), m_yAxis.Length(), m_zAxis.Length());
+
+	for (int i = 0; i < m_basisSet.Length(); i++)
+	{
+		m_basisSet[i].CalculateDataCartesian(m_xAxis, m_yAxis, m_zAxis);
+		wavefunction = wavefunction + ( m_basisSetCoefficients[level][i] * m_basisSet[i].GetData());
+		std::cout << "HERE" << std::endl;
+	}
+	return wavefunction;
+}
+
+double Molecule::CaculateMatrixElement(int level1, int level2)
+{
+	Array3D<double> overlap = Array3D<double>(m_xAxis.Length(), m_yAxis.Length(), m_zAxis.Length());
+	Array3D<double> wavefunction1 = CalculateWavefunction(level1);
+	Array3D<double> wavefunction2 = CalculateWavefunction(level2);
+
+	for (int i = 0; i < m_xAxis.Length(); i++)
+	{
+		for (int j = 0; j < m_yAxis.Length(); j++)
+		{
+			for (int k = 0; k < m_zAxis.Length(); k++)
+			{
+				double r = std::sqrt(std::pow(m_xAxis[i], 2.0) + std::pow(m_yAxis[j], 2.0) 
+									 + std::pow(m_zAxis[k], 2.0));
+				overlap[i][j][k] = wavefunction1[i][j][k] * wavefunction2[i][j][k] * r;
+			}
+		}
+	}
+	double matrixElement = Numerics::SimpsonsRule3D(m_xAxis, m_xAxis, m_xAxis, overlap);
+	return matrixElement;
+}
+
+void Molecule::SetXAxis(const Vector<double> &xAxis)
+{
+	m_xAxis = xAxis;
+}
+
+void Molecule::SetYAxis(const Vector<double> &yAxis)
+{
+	m_yAxis = yAxis;
+}
+
+void Molecule::SetZAxis(const Vector<double> &zAxis)
+{
+	m_zAxis = zAxis;
 }
 
 void Molecule::SetBasisSet()

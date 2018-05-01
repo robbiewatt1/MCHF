@@ -1,3 +1,5 @@
+#ifndef NUMERICS_HH
+#define NUMERICS_HH
 
 #include "Vector.hh"
 #include "Array3D.hh"
@@ -17,3 +19,4 @@ Vector<double> Interpolate1D(const Vector<double> &samplePoints, const Vector<do
                              const Vector<double> &queryPoints);
 
 }
+#endif

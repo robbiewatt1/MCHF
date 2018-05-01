@@ -4,6 +4,8 @@
 
 #include "Molecule.hh"
 #include "Vector.hh"
+#include "STOnGOrbit.hh"
+#include "Numerics.hh"
 
 int main(int argc, char* argv[])
 {
@@ -35,7 +37,7 @@ int main(int argc, char* argv[])
 		position[2] = posz;
 		positions.Append(position);
 	}
-
+/*
 	std::ofstream outfile("./OutputData/HeH+2.dat");
 	Molecule mol = Molecule(charges, positions, 6);
 	mol.CalculateEnergy();
@@ -43,5 +45,22 @@ int main(int argc, char* argv[])
 			<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
 			<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] << "\t" << mol.GetEnergyLevels()[7] << "\n";
 
+*/
+
+	Vector<double> xaxis(101), yaxis(101), zaxis(101);
+	for(int i = 0; i < 101; i++)
+	{
+		xaxis[i] = -10 + 20.0*(double)i/100;
+		yaxis[i] = -10 + 20.0*(double)i/100;
+		zaxis[i] = -10 + 20.0*(double)i/100;
+	}
+	Molecule mol = Molecule(charges, positions, 2);
+	mol.CalculateEnergy();
+	
+	mol.SetXAxis(xaxis);
+	mol.SetYAxis(yaxis);
+	mol.SetZAxis(zaxis); 
+
+	mol.CaculateMatrixElement(0,0);
 	return 0;
 }

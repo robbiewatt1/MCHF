@@ -3,6 +3,7 @@
 
 #include "Vector.hh"
 #include "Matrix.hh"
+#include "Array3D.hh"
 #include "STOnGOrbit.hh"
 
 class Molecule
@@ -22,11 +23,18 @@ public:
 
 	void CalculateEnergy();
 
+	Array3D<double> CalculateWavefunction(int level);
+
+	double CaculateMatrixElement(int level1, int level2);
+
 	void SetXAxis(const Vector<double> &xAxis);
 
 	void SetYAxis(const Vector<double> &yAxis);
 
 	void SetZAxis(const Vector<double> &zAxis);
+
+	void SetWavefunction(const Vector<double> &xAxis, const Vector<double> &yAxis,
+						 const Vector<double> &zAxis);
 
 private:
 
@@ -46,6 +54,10 @@ private:
 	Vector<STOnGOrbit> m_basisSet;				// Vector of the basis set functions
 	Vector<double> m_energyLevels;				// Vector of the energy levels
 	Matrix<double> m_basisSetCoefficients;		// maxtix with collumns containing coefficents of basis set
+
+	Vector<double> m_xAxis;						// Xasis of the wavefunction
+	Vector<double> m_yAxis;						// Xasis of the wavefunction
+	Vector<double> m_zAxis;						// Xasis of the wavefunction
 };
 
 

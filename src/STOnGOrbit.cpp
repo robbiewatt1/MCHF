@@ -112,7 +112,17 @@ void STOnGOrbit::CalculateDataCartesian(const Vector<double> &xAxis,
 	    const Vector<double> &yAxis,
         const Vector<double> &zAxis)
 {
+	SetXAxis(xAxis);
+	SetYAxis(yAxis);
+	SetZAxis(zAxis);
+	SetData(xAxis, yAxis, zAxis);
 
+	for (int i = 0; i < m_gaussianNumber; i++)
+	{
+		// Calculate the data for each primitive guassian
+		m_baseOrbitalVector[i].CalculateDataCartesian(xAxis, yAxis, zAxis);
+		m_data = m_data + (m_coefficeints[i] * m_baseOrbitalVector[i].GetData());
+	}
 }
 
 void STOnGOrbit::CalculateDataSpherical(const Vector<double> &rAxis,
