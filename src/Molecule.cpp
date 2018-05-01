@@ -98,9 +98,8 @@ Array3D<double> Molecule::CalculateWavefunction(int level)
 
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
-		m_basisSet[i].CalculateDataCartesian(m_xAxis, m_yAxis, m_zAxis);
-		wavefunction = wavefunction + ( m_basisSetCoefficients[level][i] * m_basisSet[i].GetData());
-		std::cout << "HERE" << std::endl;
+		Array3D<double> orbitalData = m_basisSet[i].CalculateDataCartesian(m_xAxis, m_yAxis, m_zAxis);
+		wavefunction = wavefunction + (m_basisSetCoefficients[i][level] * orbitalData);
 	}
 	return wavefunction;
 }

@@ -184,14 +184,14 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 	return (-2 * Constants::pi / gamma) * exponetialFactor * sum * nuclearCharge;
 }
 
-void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
+Array3D<double> GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
         const Vector<double> &yAxis,
         const Vector<double> &zAxis)
 {
 	SetXAxis(xAxis);
 	SetYAxis(yAxis);
 	SetZAxis(zAxis);
-	SetData(xAxis, yAxis, zAxis);
+	Array3D<double> data(xAxis.Length(), yAxis.Length(), zAxis.Length());
 
 	for (int i = 0; i < xAxis.Length(); i++)
 	{
@@ -199,23 +199,24 @@ void GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
 		{
 			for (int k = 0; k < zAxis.Length(); k++)
 			{
-				m_data[i][j][k] =  m_normaliseConstant * std::pow(xAxis(i), m_k)
+				data[i][j][k] =  m_normaliseConstant * std::pow(xAxis(i), m_k)
 				                   * std::pow(yAxis(j), m_m) * std::pow(zAxis(k), m_n)
 				                   * std::exp(-1 * m_alpha * (std::pow(xAxis(i), 2.0)
 				                              + std::pow(yAxis(j), 2.0) + std::pow(zAxis(k), 2.0)));
 			}
 		}
 	}
+	return data;
 }
 
-void GaussianOrbital::CalculateDataSpherical(const Vector<double> &rAxis,
+Array3D<double> GaussianOrbital::CalculateDataSpherical(const Vector<double> &rAxis,
         const Vector<double> &thetaAxis,
         const Vector<double> &phiAxis)
 {
 	SetXAxis(rAxis);
 	SetYAxis(thetaAxis);
 	SetZAxis(phiAxis);
-	SetData(rAxis, thetaAxis, phiAxis);
+	Array3D<double> data(rAxis.Length(), thetaAxis.Length(), phiAxis.Length());
 
 	// Set the data array
 	for (int i = 0; i < rAxis.Length(); i++)
@@ -224,7 +225,7 @@ void GaussianOrbital::CalculateDataSpherical(const Vector<double> &rAxis,
 		{
 			for (int k = 0; k < phiAxis.Length(); k++)
 			{
-				m_data[i][j][k] =  m_normaliseConstant * std::pow(rAxis(i), (m_k + m_n + m_m))
+				data[i][j][k] =  m_normaliseConstant * std::pow(rAxis(i), (m_k + m_n + m_m))
 				                   * std::pow(std::sin(thetaAxis(j)), m_k + m_m)
 				                   * std::pow(std::cos(thetaAxis(j)), m_n)
 				                   * std::pow(std::cos(phiAxis(k)), m_k)
@@ -233,6 +234,7 @@ void GaussianOrbital::CalculateDataSpherical(const Vector<double> &rAxis,
 			}
 		}
 	}
+	return data;
 }
 
 void GaussianOrbital::Normalise()

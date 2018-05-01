@@ -61,6 +61,6 @@ int main(int argc, char* argv[])
 	mol.SetYAxis(yaxis);
 	mol.SetZAxis(zaxis); 
 
-	mol.CaculateMatrixElement(0,0);
+	std::cout << mol.CaculateMatrixElement(0,0) << std::endl;
 	return 0;
 }

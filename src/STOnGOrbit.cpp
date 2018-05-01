@@ -108,24 +108,25 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, Ve
 	return potentialEnergy;
 }
 
-void STOnGOrbit::CalculateDataCartesian(const Vector<double> &xAxis,
+Array3D<double> STOnGOrbit::CalculateDataCartesian(const Vector<double> &xAxis,
 	    const Vector<double> &yAxis,
         const Vector<double> &zAxis)
 {
 	SetXAxis(xAxis);
 	SetYAxis(yAxis);
 	SetZAxis(zAxis);
-	SetData(xAxis, yAxis, zAxis);
+	Array3D<double> data(xAxis.Length(), yAxis.Length(), zAxis.Length());
 
 	for (int i = 0; i < m_gaussianNumber; i++)
 	{
 		// Calculate the data for each primitive guassian
-		m_baseOrbitalVector[i].CalculateDataCartesian(xAxis, yAxis, zAxis);
-		m_data = m_data + (m_coefficeints[i] * m_baseOrbitalVector[i].GetData());
+		Array3D<double> orbitData = m_baseOrbitalVector[i].CalculateDataCartesian(xAxis, yAxis, zAxis);
+		data = data + (m_coefficeints[i] * orbitData);
 	}
+	return data;
 }
 
-void STOnGOrbit::CalculateDataSpherical(const Vector<double> &rAxis,
+Array3D<double> STOnGOrbit::CalculateDataSpherical(const Vector<double> &rAxis,
 	    const Vector<double> &thetaAxis,
         const Vector<double> &phiAxis)
 {

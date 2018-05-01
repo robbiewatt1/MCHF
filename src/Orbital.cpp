@@ -12,15 +12,13 @@ Orbital::Orbital(const Vector<double> &xAxis, const Vector<double> &yAxis,
                  const Vector<double> &zAxis):
 	m_xAxis(xAxis), m_yAxis(yAxis), m_zAxis(zAxis)
 {
-	SetData(xAxis, yAxis, zAxis);
 }
 
 Orbital::Orbital(const Orbital &orbital)
 {
 	m_xAxis = orbital.m_xAxis;
 	m_yAxis = orbital.m_yAxis;
-	m_zAxis = orbital.m_zAxis;
-	m_data  = orbital.m_data; 
+	m_zAxis = orbital.m_zAxis; 
 }
 
 Orbital::~Orbital()
@@ -42,12 +40,6 @@ void Orbital::SetZAxis(const Vector<double> &zAxis)
 	m_zAxis = zAxis;
 }
 
-void Orbital::SetData(const Vector<double> &xAxis, const Vector<double> &yAxis,
-                      const Vector<double> &zAxis )
-{
-	m_data = Array3D<double>(xAxis.Length(), yAxis.Length(), zAxis.Length());
-}
-
 Vector<double> Orbital::GetXAxis() const
 {
 	return m_xAxis;
@@ -61,11 +53,6 @@ Vector<double> Orbital::GetYAxis() const
 Vector<double> Orbital::GetZAxis() const
 {
 	return m_zAxis;
-}
-
-Array3D<double> Orbital::GetData() const
-{
-	return m_data;
 }
 
 void Orbital::OutputData()
@@ -101,7 +88,7 @@ void Orbital::OutputData()
 	    file->createDataSet(DATASET_NAMED, H5::PredType::NATIVE_DOUBLE, dataSpace));
 	
 	// Need to convert data into contiguous array. ANNOYING! means having to double the mem :(
-	
+	Array3D<double> data = CalculateDataCartesian(m_xAxis, m_yAxis, m_zAxis);
 
 	double x_buff[m_xAxis.Length()];
 	double y_buff[m_yAxis.Length()];
@@ -116,7 +103,7 @@ void Orbital::OutputData()
 			for (int k = 0; k < m_zAxis.Length(); k++)
 			{
 				z_buff[k] = m_zAxis[k];
-				data_buff[i][j][k] = m_data[i][j][k];
+				data_buff[i][j][k] = data[i][j][k];
 			}
 		}
 	}

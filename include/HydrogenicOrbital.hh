@@ -1,3 +1,4 @@
+/*
 #ifndef HYDROGENICORBITAL__HH
 #define HYDROGENICORBITAL__HH
 
@@ -44,3 +45,4 @@ private:
 	double **m_coefficents;
 };
 #endif
+*/
