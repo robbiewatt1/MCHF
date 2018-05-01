@@ -95,8 +95,16 @@ void Molecule::SetBasisSet()
 					// Now loop over all ion sights
 					for (int i = 0; i < m_nuclearPositions.Length(); i++)
 					{
-						STOnGOrbit orbital = STOnGOrbit("./OrbitalData/STO6Test", k, m, n,
-						                                m_nuclearPositions[i]);
+						STOnGOrbit orbital;
+						if (m_nuclearCharges[i] == 1)
+						{
+							orbital = STOnGOrbit("./OrbitalData/STO6test", k, m, n,
+											     m_nuclearPositions[i]);
+						} else if(m_nuclearCharges[i] == 2)
+						{
+							orbital = STOnGOrbit("./OrbitalData/STO6He", k, m, n,
+												 m_nuclearPositions[i]);
+						}
 						m_basisSet.Append(orbital);
 					}
 				}

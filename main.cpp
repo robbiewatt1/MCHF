@@ -1,8 +1,9 @@
-#include "Molecule.hh"
-#include "Vector.hh"
 #include <cmath>
 #include <iostream>
 #include <fstream>
+
+#include "Molecule.hh"
+#include "Vector.hh"
 
 int main(int argc, char* argv[])
 {
@@ -17,42 +18,30 @@ int main(int argc, char* argv[])
 	if(!inputFile)
 	{
 		std::cerr << "Could not find file " << argv[1] << std::endl;
+		return 1;
 	}
 
-	while(inputFile)
+
+	Vector<Vector<double>> positions;
+	Vector<double> charges;
+	double Z, posx, posy, posz;
+	while(inputFile >> Z >> posx >> posy >> posz)
 	{
-		std::cout << inputFile << std::endl;
+		charges.Append(Z);
+
+		Vector<double> position(3);
+		position[0] = posx;
+		position[1] = posy;
+		position[2] = posz;
+		positions.Append(position);
 	}
 
+	std::ofstream outfile("./OutputData/HeH+2.dat");
+	Molecule mol = Molecule(charges, positions, 6);
+	mol.CalculateEnergy();
+	outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" 
+			<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
+			<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] << "\t" << mol.GetEnergyLevels()[7] << "\n";
 
-	Vector<Vector<double>> positions(2);
-	Vector<double> pos1(3),  pos2(3);
-
-	pos1[0] = 0.0;
-    pos1[1] = 0.0;
-    pos1[2] = 0.0;
-
-    pos2[0] = 0.0;
-    pos2[1] = 0.0;
-	pos2[2] = 0.0;
-
-	positions[0] = pos1;
-	positions[1] = pos2;
-
-	Vector<double> charges(2);
-	charges[0] = 1;
-	charges[1] = 1;
-	std::ofstream outfile("./H2Plus.dat");
-
-	for(int i = 0; i < 500; i++)
-	{
-		positions[0][0] = 20.0 * ((double)i /500.0);
-		std::cout << i << std::endl;
-		Molecule a = Molecule(charges, positions, 6);
-		a.CalculateEnergy();
-		outfile << positions[0][0] << "\t" << a.GetEnergyLevels()[0] << "\t" << a.GetEnergyLevels()[1] << "\t" <<
-				   a.GetEnergyLevels()[2] << "\t" << a.GetEnergyLevels()[3] << "\t" << a.GetEnergyLevels()[4]  <<
-				   "\t" << a.GetEnergyLevels()[5] << "\t" << a.GetEnergyLevels()[6] << "\t" << a.GetEnergyLevels()[7] << "\n";
-	}
 	return 0;
 }

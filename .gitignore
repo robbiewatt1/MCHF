@@ -6,3 +6,4 @@ CMakeLists.txt
 MO
 OutputData
 *.dat
+OutputData/
