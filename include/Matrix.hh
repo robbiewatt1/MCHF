@@ -59,9 +59,34 @@ class Matrix
 			}
 		}
 
+		// Copy constructor 
+		Matrix(const Matrix &matrix)
+		{
+			m_nRow = matrix.m_nRow;
+			m_nColumn = matrix.m_nColumn;
+
+			m_data = new T* [matrix.m_nRow];
+			for (int i = 0; i < matrix.m_nColumn; i++)
+			{
+				m_data[i] = new T [matrix.m_nColumn];
+			}
+
+			for (int i = 0; i < m_nRow; i++)
+			{
+				for (int j = 0; j < m_nColumn; j++)
+				{
+					m_data[i][j] = matrix.m_data[i][j];
+				}
+			}
+		}
+
 		// Defult destructor. This deletes the heap memory and avoids memory leaks
 		~Matrix()
 		{
+			for (int i = 0; i < m_nRow; i++)
+			{
+				delete[] m_data[i];
+			}
 			delete[] m_data;
 		}
 
@@ -142,6 +167,10 @@ class Matrix
 			}
 
 			// Delete any data in new matrix is holding
+			for (int i = 0; i < m_nRow; i++)
+			{
+				delete[] m_data[i];
+			}
 			delete[] m_data;
 
 			// Copy variables over

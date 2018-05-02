@@ -47,20 +47,23 @@ int main(int argc, char* argv[])
 
 */
 
-	Vector<double> xaxis(101), yaxis(101), zaxis(101);
-	for(int i = 0; i < 101; i++)
+	Vector<double> xaxis(51), yaxis(51), zaxis(51);
+	for(int i = 0; i < 51; i++)
 	{
-		xaxis[i] = -10 + 20.0*(double)i/100;
-		yaxis[i] = -10 + 20.0*(double)i/100;
-		zaxis[i] = -10 + 20.0*(double)i/100;
+		xaxis[i] = -10 + 20.0*(double)i/50;
+		yaxis[i] = -10 + 20.0*(double)i/50;
+		zaxis[i] = -10 + 20.0*(double)i/50;
 	}
-	Molecule mol = Molecule(charges, positions, 2);
+	Molecule mol = Molecule(charges, positions, 0);
 	mol.CalculateEnergy();
-	
+	mol.GetBasisCoefficients().Print();
 	mol.SetXAxis(xaxis);
 	mol.SetYAxis(yaxis);
 	mol.SetZAxis(zaxis); 
-
-	std::cout << mol.CaculateMatrixElement(0,0) << std::endl;
+	
+	Array3D<double> wavefn2 = mol.CalculateWavefunction(1);
+	Array3D<double> wavefn1 = mol.CalculateWavefunction(0);	
+	wavefn1.Print();
+	std::cout << Numerics::SimpsonsRule3D(xaxis,yaxis,zaxis,wavefn1 * wavefn1) << std::endl;
 	return 0;
 }

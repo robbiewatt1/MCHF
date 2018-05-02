@@ -82,6 +82,14 @@ public:
 	// Defult Destructor. Deletes the data to avoid memory leaks
 	~Array3D()
 	{
+		for (int i = 0; i < m_nElementsX; i++)
+		{
+			for (int j = 0; j < m_nElementsY; j++)
+			{
+				delete[] m_data[i][j];
+			}
+			delete[] m_data[i];
+		}
 		delete [] m_data;
 	}
 
@@ -140,7 +148,15 @@ public:
 		}
 
 		// Delete data held by new vector
-		delete[] m_data;
+		for (int i = 0; i < m_nElementsX; i++)
+		{
+			for (int j = 0; j < m_nElementsY; j++)
+			{
+				delete[] m_data[i][j];
+			}
+			delete[] m_data[i];
+		}
+		delete [] m_data;
 
 		// Copy variables over
 		m_nElementsX = array.m_nElementsX;

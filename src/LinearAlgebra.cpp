@@ -1,6 +1,6 @@
 #include <cmath>
 #include <limits>
-#include <Eigen>
+#include <Eigenvalues>
 
 #include "LinearAlgebra.hh"
 #include "Vector.hh"
@@ -250,6 +250,38 @@ void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &ei
 }
 
 void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, const Matrix<double> &matrixRight,
+                            Matrix<double> &eigenVectors, Vector<double> &eigenValues)
+{
+	// Need to first get data from Matrix class and map to an Eigen matrix class
+	Eigen::MatrixXd eMatrixL(matrixLeft.GetRows(), matrixLeft.GetColumns());
+	Eigen::MatrixXd eMatrixR(matrixRight.GetRows(), matrixRight.GetColumns());
+	for (int i = 0; i < matrixLeft.GetColumns(); i++)
+	{
+		eMatrixL.col(i) = Eigen::Map<Eigen::VectorXd> (matrixLeft[i], matrixLeft.GetRows());
+		eMatrixR.col(i) = Eigen::Map<Eigen::VectorXd> (matrixRight[i], matrixRight.GetRows());
+	}
+
+	// Now set up the solver and find eigen vector/values
+	Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver;
+	eigenSolver.compute(eMatrixL, eMatrixR);
+
+	// Now transfer data overt to eigenVector and eiganValues
+	for (int i = 0; i < eigenVectors.GetColumns(); i++)
+	{
+		eigenValues[i] = eigenSolver.eigenvalues()(i);
+		
+		//Caculate the normilisation of the colum cause eigen doesnt do it for me!
+		double norm = eigenSolver.eigenvectors().col(i).norm();
+		
+		for (int j = 0; j < eigenVectors.GetRows(); j++)
+		{
+			eigenVectors[j][i] = eigenSolver.eigenvectors()(j,i) / norm;
+		}
+	}
+}
+/*
+
+void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, const Matrix<double> &matrixRight,
         Matrix<double> &eigenVectors, Vector<double> &eigenvalues)
 {
 	// First we need to decompose the right matrix to a lower and upper traingula
@@ -259,11 +291,16 @@ void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, con
 	// Now find the eiganvalues and vectors of the matrix.
 	EigenSolver(symetricMatrix, eigenVectors, eigenvalues);
 	// Now find correct eiganvalues
+	std::cout << "first" << std::endl;
+	eigenVectors.Print();
 	eigenVectors = Inverse(Transpose(lowerMatrixRight)) * eigenVectors;
+	std::cout << "Second" << std::endl;
+	eigenVectors.Print();
+
 }
 
 
-/*
+
 void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors, Vector<double> &eigenValues,
                                 int nrot, int maxSweeps)
 {

@@ -80,6 +80,7 @@ void Molecule::CalculateEnergy()
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
 	                                      m_energyLevels);
+	m_basisSetCoefficients.Print();
 }
 
 Array3D<double> Molecule::CalculateWavefunction(int level)
@@ -98,7 +99,7 @@ Array3D<double> Molecule::CalculateWavefunction(int level)
 
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
-		Array3D<double> orbitalData = m_basisSet[i].CalculateDataCartesian(m_xAxis, m_yAxis, m_zAxis);
+		Array3D<double> orbitalData =  m_basisSet[i].CalculateDataCartesian(m_xAxis, m_yAxis, m_zAxis);
 		wavefunction = wavefunction + (m_basisSetCoefficients[i][level] * orbitalData);
 	}
 	return wavefunction;
@@ -108,8 +109,9 @@ double Molecule::CaculateMatrixElement(int level1, int level2)
 {
 	Array3D<double> overlap = Array3D<double>(m_xAxis.Length(), m_yAxis.Length(), m_zAxis.Length());
 	Array3D<double> wavefunction1 = CalculateWavefunction(level1);
-	Array3D<double> wavefunction2 = CalculateWavefunction(level2);
-
+//	Array3D<double> wavefunction2 = CalculateWavefunction(level2);
+	overlap = wavefunction1 * wavefunction1;
+/*
 	for (int i = 0; i < m_xAxis.Length(); i++)
 	{
 		for (int j = 0; j < m_yAxis.Length(); j++)
@@ -118,10 +120,11 @@ double Molecule::CaculateMatrixElement(int level1, int level2)
 			{
 				double r = std::sqrt(std::pow(m_xAxis[i], 2.0) + std::pow(m_yAxis[j], 2.0) 
 									 + std::pow(m_zAxis[k], 2.0));
-				overlap[i][j][k] = wavefunction1[i][j][k] * wavefunction2[i][j][k] * r;
+				overlap[i][j][k] = wavefunction1[i][j][k] * wavefunction2[i][j][k];
 			}
 		}
 	}
+*/
 	double matrixElement = Numerics::SimpsonsRule3D(m_xAxis, m_xAxis, m_xAxis, overlap);
 	return matrixElement;
 }

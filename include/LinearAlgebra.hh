@@ -44,6 +44,6 @@ void EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors,
 // Solves a generalised eiganvalue problem of the form Ax = Bex. Both A and B must be symetric
 // matrices for this method to work
 void GeneralisedEigenSolver(const Matrix<double> &matrixLeft, const Matrix<double> &matrixRight,
-                            Matrix<double> &eigenVectors, Vector<double> &eigenvalues);
+                            Matrix<double> &eigenVectors, Vector<double> &eigenValues);
 
 }
