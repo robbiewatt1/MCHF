@@ -199,10 +199,12 @@ Array3D<double> GaussianOrbital::CalculateDataCartesian(const Vector<double> &xA
 		{
 			for (int k = 0; k < zAxis.Length(); k++)
 			{
-				data[i][j][k] =  m_normaliseConstant * std::pow(xAxis(i), m_k)
-				                   * std::pow(yAxis(j), m_m) * std::pow(zAxis(k), m_n)
-				                   * std::exp(-1 * m_alpha * (std::pow(xAxis(i), 2.0)
-				                              + std::pow(yAxis(j), 2.0) + std::pow(zAxis(k), 2.0)));
+				data[i][j][k] =  m_normaliseConstant * std::pow(xAxis(i) - m_orbitPosition[0], m_k)
+				                   * std::pow(yAxis(j) - m_orbitPosition[1], m_m) 
+				                   * std::pow(zAxis(k) - m_orbitPosition[2], m_n)
+				                   * std::exp(-1 * m_alpha * (std::pow(xAxis(i) - m_orbitPosition[0], 2.0)
+				                              + std::pow(yAxis(j) - m_orbitPosition[1], 2.0) 
+				                              + std::pow(zAxis(k) - m_orbitPosition[2], 2.0)));
 			}
 		}
 	}

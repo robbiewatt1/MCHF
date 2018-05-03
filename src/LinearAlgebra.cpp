@@ -268,14 +268,10 @@ void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, con
 	// Now transfer data overt to eigenVector and eiganValues
 	for (int i = 0; i < eigenVectors.GetColumns(); i++)
 	{
-		eigenValues[i] = eigenSolver.eigenvalues()(i);
-		
-		//Caculate the normilisation of the colum cause eigen doesnt do it for me!
-		double norm = eigenSolver.eigenvectors().col(i).norm();
-		
+		eigenValues[i] = eigenSolver.eigenvalues()(i);	
 		for (int j = 0; j < eigenVectors.GetRows(); j++)
 		{
-			eigenVectors[j][i] = eigenSolver.eigenvectors()(j,i) / norm;
+			eigenVectors[j][i] = eigenSolver.eigenvectors()(j,i);
 		}
 	}
 }

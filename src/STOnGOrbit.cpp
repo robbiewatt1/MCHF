@@ -120,7 +120,7 @@ Array3D<double> STOnGOrbit::CalculateDataCartesian(const Vector<double> &xAxis,
 	for (int i = 0; i < m_gaussianNumber; i++)
 	{
 		// Calculate the data for each primitive guassian
-		Array3D<double> orbitData = m_baseOrbitalVector[i].CalculateDataCartesian(xAxis, yAxis, zAxis);
+		Array3D<double> orbitData = m_normaliseConstant * m_baseOrbitalVector[i].CalculateDataCartesian(xAxis, yAxis, zAxis) ;
 		data = data + (m_coefficeints[i] * orbitData);
 	}
 	return data;

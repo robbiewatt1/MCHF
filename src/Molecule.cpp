@@ -80,7 +80,6 @@ void Molecule::CalculateEnergy()
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
 	                                      m_energyLevels);
-	m_basisSetCoefficients.Print();
 }
 
 Array3D<double> Molecule::CalculateWavefunction(int level)
@@ -109,9 +108,9 @@ double Molecule::CaculateMatrixElement(int level1, int level2)
 {
 	Array3D<double> overlap = Array3D<double>(m_xAxis.Length(), m_yAxis.Length(), m_zAxis.Length());
 	Array3D<double> wavefunction1 = CalculateWavefunction(level1);
-//	Array3D<double> wavefunction2 = CalculateWavefunction(level2);
+	Array3D<double> wavefunction2 = CalculateWavefunction(level2);
 	overlap = wavefunction1 * wavefunction1;
-/*
+
 	for (int i = 0; i < m_xAxis.Length(); i++)
 	{
 		for (int j = 0; j < m_yAxis.Length(); j++)
@@ -124,7 +123,7 @@ double Molecule::CaculateMatrixElement(int level1, int level2)
 			}
 		}
 	}
-*/
+
 	double matrixElement = Numerics::SimpsonsRule3D(m_xAxis, m_xAxis, m_xAxis, overlap);
 	return matrixElement;
 }
