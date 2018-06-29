@@ -1,6 +1,7 @@
 #ifndef MOLECULE_HH
 #define MOLECULE_HH
 
+#include <string>
 #include "Vector.hh"
 #include "Matrix.hh"
 #include "Array3D.hh"
@@ -23,8 +24,6 @@ public:
 
 	void CalculateEnergy();
 
-	Array3D<double> CalculateWavefunction(int level);
-
 	double CaculateMatrixElement(int level1, int level2);
 
 	void SetXAxis(const Vector<double> &xAxis);
@@ -35,6 +34,10 @@ public:
 
 	void SetWavefunction(const Vector<double> &xAxis, const Vector<double> &yAxis,
 						 const Vector<double> &zAxis);
+
+	Array3D<double> CalculateWavefunction(int level);
+
+	void OutputData(int level, std::string fileName);
 
 private:
 

@@ -5,7 +5,7 @@ project(MOproject)
 enable_language(CXX)
 set (CMAKE_CXX_STANDARD 11)
 SET (CMAKE_CXX_FLAGS "-fopenmp")
-set(EIGEN_INCLUDE_DIR "/opt/local/CLib/eigen/eigen-git-mirror/Eigen")
+set(EIGEN_INCLUDE_DIR "/opt/CppLibs/eigen-git-mirror/Eigen")
 #set(EIGEN_INCLUDE_DIR "/opt/CppLibs/eigen-git-mirror/Eigen")
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
 

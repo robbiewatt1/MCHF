@@ -1,5 +1,7 @@
 #include <cmath>
 #include <omp.h>
+#include <string>
+#include "H5Cpp.h"
 #include "Molecule.hh"
 #include "LinearAlgebra.hh"
 #include "STOnGOrbit.hh"
@@ -141,6 +143,70 @@ void Molecule::SetYAxis(const Vector<double> &yAxis)
 void Molecule::SetZAxis(const Vector<double> &zAxis)
 {
 	m_zAxis = zAxis;
+}
+
+void Molecule::OutputData(int level, std::string fileName)
+{
+	const H5std_string FILE_NAME(fileName + ".h5");
+	const H5std_string DATASET_NAMEX( "xAxis" );
+	const H5std_string DATASET_NAMEY( "yAxis" );
+	const H5std_string DATASET_NAMEZ( "zAxis" );
+	const H5std_string DATASET_NAMED( "data" );
+
+	const int vector_RANK = 1;
+	const int data_RANK = 3;
+
+	H5::Exception::dontPrint();
+	H5::H5File* file = new H5::H5File(FILE_NAME, H5F_ACC_TRUNC);
+	hsize_t dataDim[3];
+	dataDim[0] = m_xAxis.Length();
+	dataDim[1] = m_yAxis.Length();
+	dataDim[2] = m_zAxis.Length();
+
+	H5::DataSpace xSpace(vector_RANK, &dataDim[0]);
+	H5::DataSpace ySpace(vector_RANK, &dataDim[1]);
+	H5::DataSpace zSpace(vector_RANK, &dataDim[2]);
+	H5::DataSpace dataSpace(data_RANK, dataDim);
+
+	H5::DataSet* xSet = new H5::DataSet(
+	    file->createDataSet(DATASET_NAMEX, H5::PredType::NATIVE_DOUBLE, xSpace));
+	H5::DataSet* ySet = new H5::DataSet(
+	    file->createDataSet(DATASET_NAMEY, H5::PredType::NATIVE_DOUBLE, ySpace));
+	H5::DataSet* zSet = new H5::DataSet(
+	    file->createDataSet(DATASET_NAMEZ, H5::PredType::NATIVE_DOUBLE, zSpace));
+	H5::DataSet* dataset = new H5::DataSet(
+	    file->createDataSet(DATASET_NAMED, H5::PredType::NATIVE_DOUBLE, dataSpace));
+	
+	// Need to convert data into contiguous array. ANNOYING! means having to double the mem :(
+	Array3D<double> data = CalculateWavefunction(level);
+
+	double x_buff[m_xAxis.Length()];
+	double y_buff[m_yAxis.Length()];
+	double z_buff[m_zAxis.Length()];
+	double data_buff[m_xAxis.Length()][m_yAxis.Length()][m_zAxis.Length()];
+	for (int i = 0; i < m_xAxis.Length(); i++)
+	{
+		x_buff[i] = m_xAxis[i];
+		for (int j = 0; j < m_yAxis.Length(); j++)
+		{
+			y_buff[j] = m_yAxis[j];
+			for (int k = 0; k < m_zAxis.Length(); k++)
+			{
+				z_buff[k] = m_zAxis[k];
+				data_buff[i][j][k] = data[i][j][k];
+			}
+		}
+	}
+	xSet->write(x_buff, H5::PredType::NATIVE_DOUBLE);
+	ySet->write(y_buff, H5::PredType::NATIVE_DOUBLE);
+	zSet->write(z_buff, H5::PredType::NATIVE_DOUBLE);
+	dataset->write(data_buff, H5::PredType::NATIVE_DOUBLE);
+
+	delete xSet;
+	delete ySet;
+	delete zSet;
+	delete dataset;
+	delete file;
 }
 
 void Molecule::SetBasisSet()

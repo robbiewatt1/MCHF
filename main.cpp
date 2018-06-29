@@ -54,17 +54,22 @@ int main(int argc, char* argv[])
 		yaxis[i] = -10 + 20.0*(double)i/100;
 		zaxis[i] = -10 + 20.0*(double)i/100;
 	}
-	Molecule mol = Molecule(charges, positions, 0);
+	Molecule mol = Molecule(charges, positions, 4);
 	mol.CalculateEnergy();
-	mol.GetBasisCoefficients().Print();
+	mol.GetEnergyLevels().Print();
 	mol.SetXAxis(xaxis);
 	mol.SetYAxis(yaxis);
-	mol.SetZAxis(zaxis); 
+	mol.SetZAxis(zaxis);
+	mol.OutputData(6, "test");
+
+
+
+
 	
-	Array3D<double> wavefn1 = mol.CalculateWavefunction(0);
-	Array3D<double> wavefn2 = mol.CalculateWavefunction(1);
-	Array3D<double> wavefn3 = wavefn1 * wavefn2;
-	std::cout << Numerics::SimpsonsRule3D(xaxis,yaxis,zaxis,wavefn3) << std::endl;
+//	Array3D<double> wavefn1 = mol.CalculateWavefunction(0);
+//	Array3D<double> wavefn2 = mol.CalculateWavefunction(1);
+//	Array3D<double> wavefn3 = wavefn1 * wavefn2;
+//	std::cout << Numerics::SimpsonsRule3D(xaxis,yaxis,zaxis,wavefn3) << std::endl;
 	
 	return 0;
 }
