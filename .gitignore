@@ -8,3 +8,4 @@ OutputData
 *.dat
 *.h5
 OutputData/
+Paraview/

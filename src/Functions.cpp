@@ -66,7 +66,7 @@ double Functions::ErrorFunction(double x)
 	double a5 = 1.061405429;
 	double p  = 0.3275911;
 	double t = 1.0/(1.0 + (p * x));
-	double erf = parity * (1 - ((a1 * t) + (a2 * std::pow(t, 2.0)) + (a3 * std::pow(t, 3.0)) + (a4 * std::pow(t, 4.0)) 
+	double erf = parity * (1.0 - ((a1 * t) + (a2 * std::pow(t, 2.0)) + (a3 * std::pow(t, 3.0)) + (a4 * std::pow(t, 4.0)) 
 				 + (a5 * std::pow(t, 5.0))) * std::exp(- (x * x)));
 	return erf;
 }
@@ -88,9 +88,9 @@ double Functions::BoysFunction(int v, double u)
 		result = factor1 * ( factor2 - std::exp(-1.0 * u) * sum);
 	} else
 	{
-		result = (1.0 / (2.0 * v + 1.0)) - (u / (2.0 * v + 3.0)) + (u * u/(2 * (2 * v + 5.0))) 
-				 - (u * u * u/(6 * (2.0 * v + 7.0))) + (u * u * u * u/(24 * (2.0 * v + 11.0)))
-				 - (u * u * u * u/(120 * (2.0 * v + 11.0)));
+		result = (1.0 / (2.0 * v + 1.0)) - (u / (2.0 * v + 3.0)) + (u * u/(2.0 * (2.0 * v + 5.0))) 
+				 - (u * u * u/(6.0 * (2.0 * v + 7.0))) + (u * u * u * u/(24 * (2.0 * v + 11.0)))
+				 - (u * u * u * u/(120.0 * (2.0 * v + 11.0)));
 	}
 	if (result < 0.0 || result > 1.0)
 	{

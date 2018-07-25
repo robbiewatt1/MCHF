@@ -54,7 +54,7 @@ public:
 
 	// Calcultes the data for a spherical grid
 
-private:
+public:
 
 	void Normalise();
 	// Normalises the wavefunction, and sets the norm constant. uses the overlap of the orbit with itself

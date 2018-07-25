@@ -67,7 +67,7 @@ double STOnGOrbit::Overlap(const STOnGOrbit &orbit)
 		for (int j = 0; j < orbit.m_gaussianNumber; j++)
 		{
 			overlap += m_baseOrbitalVector[i].Overlap(orbit.GetBaseOribtal(j)) 
-						* m_coefficeints[i] * orbit.m_coefficeints[j] 
+						* m_coefficeints[i] * orbit.m_coefficeints[j]
 						* m_baseOrbitalVector[i].GetNormaliseConstant()
 						* orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}

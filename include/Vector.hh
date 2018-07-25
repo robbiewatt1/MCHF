@@ -86,14 +86,19 @@ public:
 	// Prints the vector to the screan
 	void Print() const
 	{
-		std::cout << "[ " << std::fixed << std::setprecision(5) << m_data[0] << "\n";
-		for (int i = 1; i < m_nElements - 1; i++)
+		if(m_nElements == 1)
 		{
-			std::cout << "  " << std::fixed << std::setprecision(5) << m_data[i] << "\n";
-
+			std::cout << "[ " << std::fixed << std::setprecision(5) << m_data[0] << "]" << std::endl;;
+		} else
+		{
+			std::cout << "[ " << std::fixed << std::setprecision(5) << m_data[0] << "\n";
+			for (int i = 1; i < m_nElements - 1; i++)
+			{
+				std::cout << "  " << std::fixed << std::setprecision(5) << m_data[i] << "\n";
+			}
+			std::cout << "  " << std::fixed << std::setprecision(5) << m_data[m_nElements - 1]
+			          << " ]" << std::endl;
 		}
-		std::cout << "  " << std::fixed << std::setprecision(5) << m_data[m_nElements - 1]
-		          << " ]" << std::endl;
 	}
 
 public:
