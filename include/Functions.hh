@@ -1,6 +1,9 @@
 #ifndef FUNCTIONS_HH
 #define FUNCTIONS_HH
 
+#include "Matrix.hh"
+
+
 namespace Functions
 {
 	// Returns the factoriaol of int n
@@ -20,6 +23,9 @@ namespace Functions
 
 	double ErrorFunction(double x);
 	//Returns the error function of x to a minimum error of 1.5e-7
+
+	Matrix<double> BoysGenerator(int maxV, double maxU, int deltaU);
+	// Function to generate tabulated boys function and returned as a matrix.
 
 	double BoysFunction(int v, double u);
 }

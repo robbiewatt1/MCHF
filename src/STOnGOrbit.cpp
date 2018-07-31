@@ -68,8 +68,9 @@ double STOnGOrbit::Overlap(const STOnGOrbit &orbit)
 		{
 			overlap += m_baseOrbitalVector[i].Overlap(orbit.GetBaseOribtal(j)) 
 						* m_coefficeints[i] * orbit.m_coefficeints[j]
-						* m_baseOrbitalVector[i].GetNormaliseConstant()
-						* orbit.GetBaseOribtal(j).GetNormaliseConstant();
+						* m_normaliseConstant * orbit.m_normaliseConstant;						
+					//	* m_baseOrbitalVector[i].GetNormaliseConstant()
+					//	* orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}
 	}
 	return overlap;
@@ -84,8 +85,9 @@ double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit)
 		{
 			knieticEnergy += m_baseOrbitalVector[i].KineticOverlap(orbit.GetBaseOribtal(j)) 
 							 * m_coefficeints[i] * orbit.m_coefficeints[j]
-							 * m_baseOrbitalVector[i].GetNormaliseConstant()
-							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+							 * m_normaliseConstant * orbit.m_normaliseConstant;
+							// * m_baseOrbitalVector[i].GetNormaliseConstant()
+							// * orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}
 	}
 	return knieticEnergy;
@@ -101,8 +103,9 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, Ve
 			potentialEnergy += m_baseOrbitalVector[i].NuclearOverlap(orbit.GetBaseOribtal(j), 
 									nuclearCharge, nuclearPosition)
 							 * m_coefficeints[i] * orbit.m_coefficeints[j]
-							 * m_baseOrbitalVector[i].GetNormaliseConstant()
-							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+							 * m_normaliseConstant * orbit.m_normaliseConstant;
+							// * m_baseOrbitalVector[i].GetNormaliseConstant()
+							// * orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}
 	}
 	return potentialEnergy;
@@ -135,7 +138,16 @@ Array3D<double> STOnGOrbit::CalculateDataSpherical(const Vector<double> &rAxis,
 
 void STOnGOrbit::Normalise()
 {
-	m_normaliseConstant = std::sqrt(1.0 / Overlap(*this));
+	double overlap(0);
+	for (int i = 0; i < m_gaussianNumber; i++)
+	{
+		for (int j = 0; j < m_gaussianNumber; j++)
+		{
+			overlap += m_baseOrbitalVector[i].Overlap(m_baseOrbitalVector[j]) 
+						* m_coefficeints[i] * m_coefficeints[j];
+		}
+	}
+	m_normaliseConstant = std::sqrt(1.0 / overlap);
 }
 
 void STOnGOrbit::OpenDataFile(std::string fileName)

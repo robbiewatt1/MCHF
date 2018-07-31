@@ -2,8 +2,11 @@
 #include <cmath>
 #include <iostream>
 
+#include <omp.h>
 #include "Functions.hh"
 #include "Constants.hh"
+#include "Matrix.hh"
+#include "Vector.hh"
 
 double Functions::Factorial(double n)
 {
@@ -71,6 +74,46 @@ double Functions::ErrorFunction(double x)
 	return erf;
 }
 
+Matrix<double> Functions::BoysGenerator(int maxV, double maxU, int deltaU)
+{
+	Matrix<double> boysResult(maxV, deltaU);
+	Vector<double> uAxis(deltaU);
+
+	for (int i = 0; i < deltaU; i++)
+	{
+		uAxis[i] =  maxU * (double)i / deltaU; 
+	}
+	for(int i = 0; i < deltaU; i++)
+	{
+		double result_p;
+		if ( uAxis[i] > 1.0)
+		{
+			double sum = 0;
+			for(int j = 0; j < 20; j++)
+			{
+				sum += SemiFactorial(2 * maxV - 1) * std::pow(2 * uAxis[i], j) / SemiFactorial(2 * maxV + 2 * j + 1);
+			}
+			result_p = std::exp( -1.0 * uAxis[i]) * sum;
+		} else
+		{
+			result_p = (1.0 / (2.0 * maxV + 1.0))
+					 - (uAxis[i] / (2.0 * maxV + 3.0))
+					 + (uAxis[i] * uAxis[i] / (2.0 * (2.0 * maxV + 5.0)))
+					 - (uAxis[i] * uAxis[i] * uAxis[i] / (6.0 * (2.0 * maxV + 7.0)))
+					 + (uAxis[i] * uAxis[i] * uAxis[i] * uAxis[i] / (24.0 * (2.0 * maxV + 11.0)))
+					 - (uAxis[i] * uAxis[i] * uAxis[i] * uAxis[i] * uAxis[i] / (120.0 * (2.0 * maxV + 13.0)))
+					 + (uAxis[i] * uAxis[i] * uAxis[i] * uAxis[i] * uAxis[i] * uAxis[i] / (720.0 * (2.0 * maxV + 15.0)));
+		}
+		boysResult[0][i] = result_p;
+		for(int k = 1; k < maxV; k++)
+		{
+			boysResult[k][i] = (2 * uAxis[i] * boysResult[k-1][i] + std::exp(-uAxis[i]))
+						 / (2 * (maxV - k - 1) + 1);
+		}
+	}
+	return boysResult;
+}
+
 double Functions::BoysFunction(int v, double u)
 {
 	double result(0);
@@ -98,3 +141,4 @@ double Functions::BoysFunction(int v, double u)
 	}
 	return result;
 }
+

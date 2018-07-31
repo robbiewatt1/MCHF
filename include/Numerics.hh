@@ -18,5 +18,8 @@ double SimpsonsRule3D(const Vector <double> xAxis, const Vector <double> yAxis,
 Vector<double> Interpolate1D(const Vector<double> &samplePoints, const Vector<double> &sampleData,
                              const Vector<double> &queryPoints);
 
+// 1D interpolation using 4 points, two either side of the
+double Interpolate4p();
+
 }
 #endif

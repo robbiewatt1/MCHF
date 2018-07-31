@@ -7,6 +7,8 @@
 #include "STOnGOrbit.hh"
 #include "Numerics.hh"
 #include "GaussianOrbital.hh"
+#include "Functions.hh"
+#include "BoysFunction.hh"
 
 int main(int argc, char* argv[])
 {
@@ -53,7 +55,7 @@ int main(int argc, char* argv[])
 			<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] << "\t" << mol.GetEnergyLevels()[7] << "\n";
 
 */
-
+/*
 	Vector<double> xaxis(101), yaxis(101), zaxis(101);
 	for(int i = 0; i < 101; i++)
 	{
@@ -61,7 +63,7 @@ int main(int argc, char* argv[])
 		yaxis[i] = -5 + 10.0*(double)i/100;
 		zaxis[i] = -5 + 10.0*(double)i/100;
 	}
-	Molecule mol = Molecule(charges, positions, 2);
+	Molecule mol = Molecule(charges, positions, 0);
 	mol.CalculateEnergy();
 	mol.GetEnergyLevels().Print();
 	mol.GetBasisCoefficients().Print();
@@ -76,15 +78,24 @@ int main(int argc, char* argv[])
 //	std::cout << Numerics::SimpsonsRule3D(xaxis,yaxis,zaxis,wavefn3) << std::endl;
 
 
-//	Vector<double> loc(3);
-//	loc[0] = 0;
-//	loc[1] = 0;
-//	loc[2] = 0;
-//	STOnGOrbit test1 = STOnGOrbit("./OrbitalData/test", 0, 0, 0, loc);
-//	STOnGOrbit test2 = STOnGOrbit("./OrbitalData/test", 0, 0, 2, loc);
-//	std::cout << test1.Overlap(test2) << std::endl;
-//	std::cout << test2.GetNormaliseConstant() << std::endl;
+	Vector<double> loc(3);
+	loc[0] = 0;
+	loc[1] = 0;
+	loc[2] = 0;
 
+	GaussianOrbital testG = GaussianOrbital(0,0,0,1.0,loc);
 
+	STOnGOrbit test1 = STOnGOrbit("./OrbitalData/test", 0, 0, 0, loc);
+	STOnGOrbit test2 = STOnGOrbit("./OrbitalData/test", 0, 0, 0, loc);
+	std::cout << test1.NuclearOverlap(test2,1.0,loc) << std::endl;
+        std::cout << testG.NuclearOverlap(testG,1.0,loc) << std::endl;
+	std::cout << "\n\n\n" << std::endl;
+	std::cout << testG.GetNormaliseConstant() << std::endl;
+	std::cout << test1.GetNormaliseConstant() << std::endl;
+
+	std::cout << Functions::BoysFunction(0,30.51) << std::endl;
+*/
+	BoysFunction test = BoysFunction(5,10,10);
+	std::cout << test.Interpolate(5,10.9) << std::endl;
 	return 0;
 }

@@ -80,31 +80,30 @@ double GaussianOrbital::Overlap(const GaussianOrbital &orbit)
 
 double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 {
-	double overlap = this->Overlap(orbit);
-	double plus2k  = this->Overlap(orbit.ChangeK(2));
-	double plus2m  = this->Overlap(orbit.ChangeM(2));
-	double plus2n  = this->Overlap(orbit.ChangeN(2));
+	double overlap = this->Overlap(orbit) / (m_normaliseConstant * orbit.m_normaliseConstant);
+	double plus2k  = this->Overlap(orbit.ChangeK(2)) / (m_normaliseConstant * orbit.ChangeK(2).m_normaliseConstant);
+	double plus2m  = this->Overlap(orbit.ChangeM(2)) / (m_normaliseConstant * orbit.ChangeM(2).m_normaliseConstant);
+	double plus2n  = this->Overlap(orbit.ChangeN(2)) / (m_normaliseConstant * orbit.ChangeN(2).m_normaliseConstant);
 	double minus2K(0), minus2M(0), minus2N(0);
 
 	if (orbit.m_k > 1)
 	{
-		minus2K = this->Overlap(orbit.ChangeK(-2));
+		minus2K = this->Overlap(orbit.ChangeK(-2)) / (m_normaliseConstant * orbit.ChangeK(-2).m_normaliseConstant);
 	}
 	if (orbit.m_m > 1)
 	{
-		minus2M = this->Overlap(orbit.ChangeM(-2));
+		minus2M = this->Overlap(orbit.ChangeM(-2)) / (m_normaliseConstant * orbit.ChangeM(-2).m_normaliseConstant);
 	}
 	if (orbit.m_n > 1)
 	{
-		minus2N = this->Overlap(orbit.ChangeN(-2));
+		minus2N = this->Overlap(orbit.ChangeN(-2)) / (m_normaliseConstant * orbit.ChangeN(-2).m_normaliseConstant);
 	}
-
 	double kinOverlap = (orbit.m_alpha * (2.0 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3.0) * overlap)
 	                    - (2.0 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
 	                    - (0.5 * (orbit.m_k * (orbit.m_k - 1.0) * minus2K
 	                              + orbit.m_m * (orbit.m_m - 1.0) * minus2M
 	                              + orbit.m_n * (orbit.m_n - 1.0) * minus2N));
-	return kinOverlap;
+	return kinOverlap * m_normaliseConstant * orbit.m_normaliseConstant;
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
