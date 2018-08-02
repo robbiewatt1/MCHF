@@ -2,6 +2,7 @@
 #define GAUSSIANORBITAL_HH
 
 #include "Orbital.hh"
+#include "BoysFunction.hh"
 
 class GaussianOrbital : public Orbital
 {
@@ -39,7 +40,7 @@ public:
 	// Calculates the kinetic overlap of the two orbitals. This includes the -0.5
 
 	double NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
-	                      Vector<double> nuclearPosition);
+	                      const Vector<double> &nuclearPosition, const BoysFunction &boyFn);
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
 

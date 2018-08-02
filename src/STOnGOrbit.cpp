@@ -93,7 +93,8 @@ double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit)
 	return knieticEnergy;
 }
 
-double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, Vector<double> nuclearPosition)
+double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, 
+								  const Vector<double> &nuclearPosition, const BoysFunction &boyFn)
 {
 	double potentialEnergy(0);
 	for (int i = 0; i < m_gaussianNumber; i++)
@@ -101,7 +102,7 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, Ve
 		for (int j = 0; j < orbit.m_gaussianNumber; j++)
 		{
 			potentialEnergy += m_baseOrbitalVector[i].NuclearOverlap(orbit.GetBaseOribtal(j), 
-									nuclearCharge, nuclearPosition)
+									nuclearCharge, nuclearPosition, boyFn)
 							 * m_coefficeints[i] * orbit.m_coefficeints[j]
 							 * m_normaliseConstant * orbit.m_normaliseConstant;
 							// * m_baseOrbitalVector[i].GetNormaliseConstant()

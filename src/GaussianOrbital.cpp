@@ -107,7 +107,7 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
-                                       Vector<double> nuclearPosition)
+                                       const Vector<double> &nuclearPosition, const BoysFunction &boyFn)
 {
 	double gamma  = m_alpha + orbit.m_alpha;
 	Vector<double> positionP(3);
@@ -124,7 +124,7 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 	                + std::pow(nuclearPosition[1] - positionP[1], 2.0)
 	                + std::pow(nuclearPosition[2] - positionP[2], 2.0);
 
-	double exponetialFactor = std::exp(-1 * m_alpha * orbit.m_alpha * posAB2 / gamma);
+	double exponetialFactor = std::exp(-1.0 * m_alpha * orbit.m_alpha * posAB2 / gamma);
 
 	double sum(0);
 	int maxK = m_k + orbit.m_k;
@@ -167,9 +167,9 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 										                            m_orbitPosition[2],
 										                            orbit.m_orbitPosition[2],
 										                            nuclearPosition[2]);
-										int boysIndex = (k + m + n) - (2 * (r + s + t))
+										int boysIndex = (k + m + n) - ( 2 * (r + s + t))
 										                - (i + j + l);
-										sum += Ax * Ay * Az * Functions::BoysFunction(boysIndex, gamma * posPC2);
+										sum += Ax * Ay * Az * boyFn.Interpolate(boysIndex, gamma * posPC2);
 									}
 								}
 							}

@@ -10,13 +10,17 @@ public:
 	// This is a class that is used to calculate the boys function which is a standard integral. 
 	// The maximum values for u and v should be found before and then passed to the class. 
 
+	BoysFunction();
+	
 	BoysFunction(int maxV, double maxU, int uLength);
 
 	~BoysFunction();
 
+	// Interpolation using 4 points => quadratic. Can be easily increased if needed
 	double Interpolate(int v, double u) const;
 
 private:
+	// Function that is called in the constructor that generates tabulated boysdata
 	void BoysGenerator();
 
 private:

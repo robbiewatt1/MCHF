@@ -12,10 +12,11 @@ Molecule::Molecule()
 }
 
 Molecule::Molecule(const Vector<double> &nuclearCharges,
-                   const Vector<Vector<double>> &nuclearPositions, int maxL):
+                   const Vector<Vector<double>> &nuclearPositions, int maxL, const BoysFunction &boyFn):
 	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
 {
 	SetBasisSet();
+	m_boyFn = boyFn; // 10 x seems good enough for roughly 10^-7 
 }
 
 Molecule::~Molecule()
@@ -60,7 +61,7 @@ void Molecule::CalculateEnergy()
 			{
 				nuclearPotential += m_basisSet[i].NuclearOverlap(m_basisSet[j],
 				                    m_nuclearCharges[k],
-									m_nuclearPositions[k]);
+									m_nuclearPositions[k], m_boyFn);
 								//	* m_basisSet[j].GetNormaliseConstant()
 								//	* m_basisSet[i].GetNormaliseConstant();
 			}
@@ -72,20 +73,16 @@ void Molecule::CalculateEnergy()
 								 // * m_basisSet[i].GetNormaliseConstant()
 			                     // * m_basisSet[j].GetNormaliseConstant();
 			energyMaxtrix[i][j] = kineticEnergy + nuclearPotential + potential * overlapMatrix[i][j];
-			
 
 			// Matrix is symetric
 			overlapMatrix[j][i] = overlapMatrix[i][j];
 			energyMaxtrix[j][i] = energyMaxtrix[i][j];
 		}
 	}
-	energyMaxtrix.Print();
-	overlapMatrix.Print();
 	m_energyLevels = Vector<double>(m_basisSet.Length());
 	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
                                       m_energyLevels);
-
 }
 
 Array3D<double> Molecule::CalculateWavefunction(int level)
@@ -229,27 +226,26 @@ void Molecule::SetBasisSet()
 					{
 						if (m_nuclearCharges[i] == 1)
 						{
-							std::cout << k << " " << m << " " << n << std::endl;
 							STOnGOrbit orbital1;
-						//	STOnGOrbit orbital2;
-						//	STOnGOrbit orbital3;
-						//	STOnGOrbit orbital4;
-						//	STOnGOrbit orbital5;
-							orbital1 = STOnGOrbit("./OrbitalData/STO6H", k, m, n,
+							STOnGOrbit orbital2;
+							STOnGOrbit orbital3;
+							STOnGOrbit orbital4;
+							STOnGOrbit orbital5;
+							orbital1 = STOnGOrbit("./OrbitalData/6311GSS/S1", k, m, n,
 											     m_nuclearPositions[i]);
-						//	orbital2 = STOnGOrbit("./OrbitalData/6311GSS/S2", k, m, n,
-						//					     m_nuclearPositions[i]);
-						//	orbital3 = STOnGOrbit("./OrbitalData/6311GSS/S3", k, m, n,
-						//					     m_nuclearPositions[i]);
-						//	orbital4 = STOnGOrbit("./OrbitalData//6311GSS/S4", k, m, n,
-						//					     m_nuclearPositions[i]);
-						//	orbital5 = STOnGOrbit("./OrbitalData//6311GSS/P1", k, m, n,
-						//					     m_nuclearPositions[i]);										     							
+							orbital2 = STOnGOrbit("./OrbitalData/6311GSS/S2", k, m, n,
+											     m_nuclearPositions[i]);
+							orbital3 = STOnGOrbit("./OrbitalData/6311GSS/S3", k, m, n,
+											     m_nuclearPositions[i]);
+							orbital4 = STOnGOrbit("./OrbitalData//6311GSS/S4", k, m, n,
+											     m_nuclearPositions[i]);
+							orbital5 = STOnGOrbit("./OrbitalData//6311GSS/P1", k, m, n,
+											     m_nuclearPositions[i]);										     							
 							m_basisSet.Append(orbital1);
-						//	m_basisSet.Append(orbital2);
-						//	m_basisSet.Append(orbital3);
-						//	m_basisSet.Append(orbital4);
-						//	m_basisSet.Append(orbital5);
+							m_basisSet.Append(orbital2);
+							m_basisSet.Append(orbital3);
+							m_basisSet.Append(orbital4);
+							m_basisSet.Append(orbital5);
 						} else if(m_nuclearCharges[i] == 2)
 						{
 							STOnGOrbit orbital;

@@ -6,6 +6,8 @@
 #include "Matrix.hh"
 #include "Array3D.hh"
 #include "STOnGOrbit.hh"
+#include "BoysFunction.hh"
+
 
 class Molecule
 {
@@ -14,7 +16,7 @@ public:
 	Molecule();
 
 	Molecule(const Vector<double> &nuclearCharges, const Vector<Vector<double>> &nuclearPositions,
-	         int maxL);
+	         int maxL, const BoysFunction &boyFn);
 
 	~Molecule();
 
@@ -61,6 +63,8 @@ private:
 	Vector<double> m_xAxis;						// Xasis of the wavefunction
 	Vector<double> m_yAxis;						// Xasis of the wavefunction
 	Vector<double> m_zAxis;						// Xasis of the wavefunction
+
+	BoysFunction m_boyFn;						// The BoysFunction data  
 };
 
 
