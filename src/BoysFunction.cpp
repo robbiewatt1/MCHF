@@ -19,7 +19,7 @@ BoysFunction::BoysFunction(int maxV, double maxU, int uLength)
 
 	for (int i = 0; i < m_uLength; i++)
 	{
-		m_uAxis[i] =  maxU * (double)i / (m_uLength - 1.0); 
+		m_uAxis[i] =  (maxU * (double)i / (m_uLength - 1.0));// * (maxU * (double)i / (m_uLength - 1.0)) / maxU;
 	}
 	for (int i = 0; i < m_vLength; i++)
 	{
@@ -80,6 +80,10 @@ double BoysFunction::Interpolate(int v, double u) const
 		for (int i = 0; i < 4; i++)
 		{
 			iIndex = loc1 + i - 1;
+			if(iIndex < 0)
+			{
+				std::cerr << "error" << std::endl;
+			}
 			double poln(1.0);
 			for (int j = 0; j < 4; j++)
 			{

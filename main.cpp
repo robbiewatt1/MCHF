@@ -41,25 +41,41 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxU = 10000;
-	BoysFunction boyFn = BoysFunction(8, maxU, 10000*maxU);
-	std::ofstream outfile("./OutputData/res1.dat");
-	for(int i = 40; i >= 1; i--)
+	int maxL = 2;
+	int maxU = 1000000;
+	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
+	std::ofstream outfile("./OutputData/test.dat");
+	for(int i = 100; i >= 1; i--)
 	{
-		positions[0][0] = (double)i / 4.0;
-		Molecule mol = Molecule(charges, positions, 2, boyFn);
+		positions[0][0] = (double)i / 6.0;
+		Molecule mol = Molecule(charges, positions, maxL, boyFn);
 		mol.CalculateEnergy();
-		outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" 
-				<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
-				<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] 
-				<< "\t" << mol.GetEnergyLevels()[7] << "\n";
-		std::cout <<positions[0][0] << " " << mol.GetEnergyLevels()[0] << " " << mol.GetEnergyLevels()[1] << " " << mol.GetEnergyLevels()[2] << mol.GetEnergyLevels()[3] << " " << mol.GetEnergyLevels()[4] << " " << mol.GetEnergyLevels()[5] << std::endl;
+		mol.GetEnergyLevels().Print();
+		outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << std::endl;
+			//	<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
+				//<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] 
+				//<< "\t" << mol.GetEnergyLevels()[7] << "\n";
+	//	std::cout <<positions[0][0] << " " << mol.GetEnergyLevels()[0] << " " << mol.GetEnergyLevels()[1] << " " << mol.GetEnergyLevels()[2] << mol.GetEnergyLevels()[3] << " " << mol.GetEnergyLevels()[4] << " " << mol.GetEnergyLevels()[5] << std::endl;
 
 	}
 
 
-//	mol.OutputData(7, "./Paraview/test2");
-	
+
+/*
+    int maxL = 2;
+    int maxU = 1000000;
+    BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
+
+    std::ofstream file("./test");
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 1000; ++j)
+		{
+			file << boyFn.Interpolate(i,j) << "\t";
+		}
+		file << "\n";
+	}
+*/	
 
 	return 0;
 }

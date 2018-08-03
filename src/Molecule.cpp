@@ -224,35 +224,20 @@ void Molecule::SetBasisSet()
 					// Now loop over all ion sights
 					for (int i = 0; i < m_nuclearPositions.Length(); i++)
 					{
-						if (m_nuclearCharges[i] == 1)
-						{
-							STOnGOrbit orbital1;
-							STOnGOrbit orbital2;
-							STOnGOrbit orbital3;
-							STOnGOrbit orbital4;
-							STOnGOrbit orbital5;
-							orbital1 = STOnGOrbit("./OrbitalData/6311GSS/S1", k, m, n,
-											     m_nuclearPositions[i]);
-							orbital2 = STOnGOrbit("./OrbitalData/6311GSS/S2", k, m, n,
-											     m_nuclearPositions[i]);
-							orbital3 = STOnGOrbit("./OrbitalData/6311GSS/S3", k, m, n,
-											     m_nuclearPositions[i]);
-							orbital4 = STOnGOrbit("./OrbitalData//6311GSS/S4", k, m, n,
-											     m_nuclearPositions[i]);
-							orbital5 = STOnGOrbit("./OrbitalData//6311GSS/P1", k, m, n,
-											     m_nuclearPositions[i]);										     							
-							m_basisSet.Append(orbital1);
-							m_basisSet.Append(orbital2);
-							m_basisSet.Append(orbital3);
-							m_basisSet.Append(orbital4);
-							m_basisSet.Append(orbital5);
-						} else if(m_nuclearCharges[i] == 2)
-						{
-							STOnGOrbit orbital;
-							orbital = STOnGOrbit("./OrbitalData/STO6He", k, m, n,
-												 m_nuclearPositions[i]);
-							m_basisSet.Append(orbital);
-						}
+						std::string filePath = "./OrbitalData/STO6/" 
+												+ std::to_string((int)m_nuclearCharges[i]) + "/";
+						STOnGOrbit orbital1 = STOnGOrbit(filePath + "S1", k, m, n,
+										     m_nuclearPositions[i]);
+						//STOnGOrbit orbital2 = STOnGOrbit(filePath + "S2", k, m, n,
+						//				     m_nuclearPositions[i]);
+						//STOnGOrbit orbital3 = STOnGOrbit(filePath + "S3", k, m, n,
+						//		     m_nuclearPositions[i]);
+						//STOnGOrbit orbital4 = STOnGOrbit(filePath + "P1", k, m, n,
+						//				     m_nuclearPositions[i]);
+						m_basisSet.Append(orbital1);
+						//m_basisSet.Append(orbital2);
+						//m_basisSet.Append(orbital3);
+						//m_basisSet.Append(orbital4);
 					}
 				}
 			}
