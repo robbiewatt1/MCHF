@@ -8,12 +8,13 @@ SET (CMAKE_CXX_FLAGS "-fopenmp")
 set(EIGEN_INCLUDE_DIR "/opt/CppLibs/eigen-git-mirror/Eigen")
 #set(EIGEN_INCLUDE_DIR "/opt/clib/eigen-eigen-b9cd8366d4e8/Eigen")
 find_package(HDF5 REQUIRED COMPONENTS C CXX)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
-include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/include ${HDF5_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
 add_executable(MO main.cpp ${sources} ${headers})
-target_link_libraries(MO ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES})
+target_link_libraries(MO ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS MO DESTINATION bin)

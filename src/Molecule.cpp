@@ -2,6 +2,8 @@
 #include <omp.h>
 #include <string>
 #include "H5Cpp.h"
+#include "boost/filesystem.hpp"
+
 #include "Molecule.hh"
 #include "LinearAlgebra.hh"
 #include "STOnGOrbit.hh"
@@ -15,7 +17,7 @@ Molecule::Molecule(const Vector<double> &nuclearCharges,
                    const Vector<Vector<double>> &nuclearPositions, int maxL, const BoysFunction &boyFn):
 	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
 {
-	SetBasisSet();
+	SetBasisSet("./OrbitalData/STO6/" );
 	m_boyFn = boyFn;
 }
 
@@ -78,6 +80,33 @@ void Molecule::CalculateEnergy()
                                       m_energyLevels);
 }
 
+Vector<double> Molecule::MatrixElement(int level1, int level2)
+{
+	Vector<double> matrixElement(3);
+	if (m_energyLevels.Length() == 0)
+	{
+		std::cerr << "Error: Must first call CalculateEnergy to set energy levels" << std::endl;
+		std::exit(-1);
+	}
+	for (int i = 0; i < m_basisSet.Length(); i++)
+	{
+		for (int j = 0; j < m_basisSet.Length(); j++)
+		{
+			matrixElement = matrixElement + m_basisSet[i].MatrixElement(m_basisSet[j])
+						  * (m_basisSetCoefficients[i][level1] * m_basisSetCoefficients[j][level2]);
+		}
+	}
+	return matrixElement;
+}
+
+double Molecule::OscilatorStrength(int level1, int level2)
+{
+	Vector<double> matrixElement = MatrixElement(level1, level2);
+	double mE_2 = matrixElement[0] * matrixElement[0] + matrixElement[1] * matrixElement[1] 
+				+ matrixElement[2] * matrixElement[2];
+	return (2.0 / 3.0) * (m_energyLevels[level2] - m_energyLevels[level1]) * mE_2;
+}
+
 Array3D<double> Molecule::CalculateWavefunction(int level)
 {
 	if (m_xAxis.Length() == 0)
@@ -98,25 +127,6 @@ Array3D<double> Molecule::CalculateWavefunction(int level)
 		wavefunction = wavefunction + (m_basisSetCoefficients[i][level] * orbitalData);
 	}
 	return wavefunction;
-}
-
-Vector<double> Molecule::MatrixElement(int level1, int level2)
-{
-	Vector<double> matrixElement(3);
-	if (m_energyLevels.Length() == 0)
-	{
-		std::cerr << "Error: Must first call CalculateEnergy to set energy levels" << std::endl;
-		std::exit(-1);
-	}
-	for (int i = 0; i < m_basisSet.Length(); i++)
-	{
-		for (int j = 0; j < m_basisSet.Length(); j++)
-		{
-			matrixElement = matrixElement + m_basisSet[i].MatrixElement(m_basisSet[j])
-						  * (m_basisSetCoefficients[i][level1] * m_basisSetCoefficients[j][level2]);
-		}
-	}
-	return matrixElement;
 }
 
 void Molecule::SetXAxis(const Vector<double> &xAxis)
@@ -198,37 +208,43 @@ void Molecule::OutputData(int level, std::string fileName)
 	delete file;
 }
 
-void Molecule::SetBasisSet()
+void Molecule::SetBasisSet(std::string basisSetDir)
 {
-	// Loop over k, m and n such that the sum is less than the maximum L
-	for (int n = 0; n <= m_maxL; n++)
+	// Loop over all ions involved
+	for (int i = 0; i < m_nuclearPositions.Length(); i++)
 	{
-		for (int m = 0; m <= m_maxL; m++)
+		// First check to see if the directory exists.
+		Vector<std::string> fileNames;
+		std::string ionOrbitals = basisSetDir + std::to_string((int)m_nuclearCharges[i]);
+		if(boost::filesystem::is_directory(ionOrbitals) == false)
 		{
-			for (int k = 0; k <= m_maxL; k++)
+			std::cerr << "Error: " << ionOrbitals << " cannot be found" << std::endl;
+			exit(-1); 
+		} else
+		{
+			for(boost::filesystem::directory_iterator file = boost::filesystem::directory_iterator(ionOrbitals);
+				file != boost::filesystem::directory_iterator(); ++file)
 			{
-				if (n + m + k <= m_maxL)
+				fileNames.Append(file->path().string());
+			}
+		}
+		// Loop over k, m and n such that the sum is less than the maximum L
+		for (int n = 0; n <= m_maxL; n++)
+		{
+			for (int m = 0; m <= m_maxL; m++)
+			{
+				for (int k = 0; k <= m_maxL; k++)
 				{
-					// Now loop over all ion sights
-					for (int i = 0; i < m_nuclearPositions.Length(); i++)
+					if (n + m + k <= m_maxL)
 					{
-						std::string filePath = "./OrbitalData/6311GSS/" 
-												+ std::to_string((int)m_nuclearCharges[i]) + "/";
-						STOnGOrbit orbital1 = STOnGOrbit(filePath + "S1", k, m, n,
+						// Now loop through basis sets
+						for (int j = 0; j < fileNames.Length(); ++j)
+						{
+							STOnGOrbit orbital = STOnGOrbit(fileNames[j], k, m, n,
 										     m_nuclearPositions[i]);
-						STOnGOrbit orbital2 = STOnGOrbit(filePath + "S2", k, m, n,
-										     m_nuclearPositions[i]);
-						STOnGOrbit orbital3 = STOnGOrbit(filePath + "S3", k, m, n,
-								     m_nuclearPositions[i]);
-						STOnGOrbit orbital4 = STOnGOrbit(filePath + "S4", k, m, n,
-										     m_nuclearPositions[i]);
-						STOnGOrbit orbital5 = STOnGOrbit(filePath + "P1", k, m, n,
-										     m_nuclearPositions[i]);
-						m_basisSet.Append(orbital1);
-						m_basisSet.Append(orbital2);
-						m_basisSet.Append(orbital3);
-						m_basisSet.Append(orbital4);
-						m_basisSet.Append(orbital5);						
+							m_basisSet.Append(orbital);
+						}
+
 					}
 				}
 			}

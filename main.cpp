@@ -41,29 +41,22 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 7;
-	int maxU = 100;
-	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
-	std::ofstream outfile("./OutputData/testMe.dat");
-	for(int i = 10; i >= 1; i--)
+	int maxL = 9;
+	int maxU = 1;
+	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 10*maxU);
+	std::ofstream outfile("./OutputData/H2+OscStr.dat");
+	for(int i = 60; i >= 1; i--)
 	{
 		srand((unsigned int) time(0));
 		positions[0][0] = (double)i / 10.0;
 		Molecule mol = Molecule(charges, positions, maxL, boyFn);
 		mol.CalculateEnergy();
-		Vector<double> me = mol.MatrixElement(0,1);
-		Vector<double> me2 = mol.MatrixElement(0,2);
-		Vector<double> me3 = mol.MatrixElement(0,3);
-		std::cout << mol.GetEnergyLevels()[0] << std::endl;
-		std::cout << (me[0] * me[0] + me[1] * me[1] + me[2] * me[2]) + (me2[0] * me2[0] + me2[1] * me2[1] + me2[2] * me2[2]) + (me3[0] * me3[0] + me3[1] * me3[1] + me3[2] * me3[2]) << std::endl;
+		double me  = mol.OscilatorStrength(0,1);
+		double me2 = mol.OscilatorStrength(0,2);
+		double me3 = mol.OscilatorStrength(0,3);
+		mol.GetEnergyLevels().Print();
 
-		outfile << positions[0][0] << "\t" << me[0] << "\t" << me[1] << "\t" << me[2] << std::endl;
-		//outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << std::endl;
-			//	<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
-				//<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] 
-				//<< "\t" << mol.GetEnergyLevels()[7] << "\n";
-	//	std::cout <<positions[0][0] << " " << mol.GetEnergyLevels()[0] << " " << mol.GetEnergyLevels()[1] << " " << mol.GetEnergyLevels()[2] << mol.GetEnergyLevels()[3] << " " << mol.GetEnergyLevels()[4] << " " << mol.GetEnergyLevels()[5] << std::endl;
-
+		outfile << positions[0][0] << "\t" << me << std::endl;
 	}
 	return 0;
 }

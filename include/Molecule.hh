@@ -28,6 +28,8 @@ public:
 
 	Vector<double> MatrixElement(int level1, int level2);
 
+	double OscilatorStrength(int level1, int level2);
+
 	void SetXAxis(const Vector<double> &xAxis);
 
 	void SetYAxis(const Vector<double> &yAxis);
@@ -43,7 +45,7 @@ public:
 
 private:
 
-	void SetBasisSet();
+	void SetBasisSet(std::string basisSetDir);
 	// Sets up the basis set vecotr. All orbitals l = n + m + k <= lMax * number of ions
 
 	double CalculatePotential(int z1, int z2, Vector<double> ionLocation1,

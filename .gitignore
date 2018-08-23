@@ -7,6 +7,6 @@ MO
 *.dat
 *.h5
 *.png
-OutputData/
+OutputData/*
 Paraview/
 PythonPlots/Plots/

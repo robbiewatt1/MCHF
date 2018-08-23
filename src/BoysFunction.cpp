@@ -106,7 +106,7 @@ void BoysFunction::BoysGenerator()
 	for(int i = 0; i < m_uAxis.Length(); i++)
 	{
 		double result_p;
-		if (m_uAxis[i] < 1.0)
+		if (m_uAxis[i] < 0.01)
 		{
 			result_p = (1.0 / (2.0 * m_vAxis.End() + 1.0))
 					 - (m_uAxis[i] / (2.0 * m_vAxis.End() + 3.0))
@@ -118,7 +118,7 @@ void BoysFunction::BoysGenerator()
 		} else if(m_uAxis[i] < 20.0)
 		{
 			double sum = 0;
-			for(int j = 0; j < 30; j++)
+			for(int j = 0; j < 40; j++)
 			{
 				sum += Functions::SemiFactorial(2.0 * m_vAxis.End() - 1.0) * std::pow(2.0 * m_uAxis[i], j) 
 					  / Functions::SemiFactorial(2.0 * m_vAxis.End() + 2.0 * j + 1.0);
