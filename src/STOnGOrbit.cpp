@@ -24,22 +24,22 @@ STOnGOrbit::~STOnGOrbit()
 {
 }
 
-int STOnGOrbit::GetK()
+int STOnGOrbit::GetK() const
 {
 	return m_k;
 }
 
-int STOnGOrbit::GetM()
+int STOnGOrbit::GetM() const
 {
 	return m_m;
 }
 
-int STOnGOrbit::GetN()
+int STOnGOrbit::GetN() const
 {
 	return m_n;
 }
 
-double STOnGOrbit::GetNormaliseConstant()
+double STOnGOrbit::GetNormaliseConstant() const
 {
 	return m_normaliseConstant;
 }
@@ -59,7 +59,7 @@ double STOnGOrbit::GetCoefficient(int i) const
 	return m_coefficeints[i];
 }
 
-double STOnGOrbit::Overlap(const STOnGOrbit &orbit)
+double STOnGOrbit::Overlap(const STOnGOrbit &orbit) const
 {
 	double overlap(0);
 	for (int i = 0; i < m_gaussianNumber; i++)
@@ -76,7 +76,7 @@ double STOnGOrbit::Overlap(const STOnGOrbit &orbit)
 	return overlap;
 }
 
-double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit)
+double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit) const
 {
 	double knieticEnergy(0);
 	for (int i = 0; i < m_gaussianNumber; i++)
@@ -94,7 +94,7 @@ double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit)
 }
 
 double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge, 
-								  const Vector<double> &nuclearPosition, const BoysFunction &boyFn)
+								  const Vector<double> &nuclearPosition, const BoysFunction &boyFn) const
 {
 	double potentialEnergy(0);
 	for (int i = 0; i < m_gaussianNumber; i++)
@@ -110,6 +110,21 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge,
 		}
 	}
 	return potentialEnergy;
+}
+
+Vector<double> STOnGOrbit::MatrixElement(const STOnGOrbit &orbit) const
+{
+	Vector<double> matrixElements(3);
+	for (int i = 0; i < m_gaussianNumber; i++)
+	{
+		for (int j = 0; j < orbit.m_gaussianNumber; j++)
+		{
+			matrixElements = matrixElements + m_baseOrbitalVector[i].MatrixElement(orbit.GetBaseOribtal(j))
+						 	* m_coefficeints[i] * orbit.m_coefficeints[j]
+						 	* m_normaliseConstant * orbit.m_normaliseConstant;
+		}
+	}
+	return matrixElements;
 }
 
 Array3D<double> STOnGOrbit::CalculateDataCartesian(const Vector<double> &xAxis,

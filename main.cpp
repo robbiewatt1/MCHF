@@ -12,6 +12,13 @@
 
 int main(int argc, char* argv[])
 {
+//	Vector<double> pos(3);
+//	pos[0] = 0.0;
+//	pos[1] = 0.0;
+//	pos[2] = 0.0;
+//	GaussianOrbital test = GaussianOrbital(0,0,0,1.0,pos);
+//	GaussianOrbital test2 = GaussianOrbital(1,0,0,1.0,pos);
+//	std::cout << test.MatrixElement(test2)[0] << " " << test.MatrixElement(test2)[1] << " " << test.MatrixElement(test2)[2] << std::endl;
 	if(argc != 2)
 	{
 		std::cerr << "ERROR: Incorrect use of " << argv[0] << std::endl;
@@ -41,17 +48,25 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 2;
+	int maxL = 1;
 	int maxU = 1000000;
 	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
-	std::ofstream outfile("./OutputData/test.dat");
-	for(int i = 100; i >= 1; i--)
+	std::ofstream outfile("./OutputData/testMe.dat");
+	for(int i = 10; i >= 1; i--)
 	{
-		positions[0][0] = (double)i / 6.0;
+		srand((unsigned int) time(0));
+		positions[0][0] = (double)i / 10.0;
 		Molecule mol = Molecule(charges, positions, maxL, boyFn);
 		mol.CalculateEnergy();
+		Vector<double> me = mol.MatrixElement(0,1);
+		Vector<double> me2 = mol.MatrixElement(0,2);
+		Vector<double> me3 = mol.MatrixElement(0,3);
 		mol.GetEnergyLevels().Print();
-		outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << std::endl;
+		me.Print();
+		me2.Print();
+		me3.Print();
+		outfile << positions[0][0] << "\t" << me[0] << "\t" << me[1] << "\t" << me[2] << std::endl;
+		//outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << std::endl;
 			//	<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
 				//<< "\t" << mol.GetEnergyLevels()[5] << "\t" << mol.GetEnergyLevels()[6] 
 				//<< "\t" << mol.GetEnergyLevels()[7] << "\n";

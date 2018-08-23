@@ -40,7 +40,7 @@ public:
 		// Check if T is double / int /complex. If so then set all values to 0;
 		for (int i = 0; i < m_nElements; i++)
 		{
-//			m_data[i] = 0;
+			m_data[i] = 0;
 		}
 	}
 
@@ -162,7 +162,6 @@ public:
 	{
 		assert(vector1.m_nElements == vector2.m_nElements);
 		Vector<T> newVector = Vector<T>(vector1.m_nElements);
-
 		for (int i = 0; i < vector1.m_nElements; i++)
 		{
 			newVector(i) = vector1.m_data[i] + vector2.m_data[i];	
@@ -230,6 +229,17 @@ public:
 	};
 
 	friend Vector<T> operator*(const T scalar, const Vector<T> &vector)
+	{
+		Vector<T> newVector = Vector<T>(vector.m_nElements);
+		
+		for (int i = 0; i < vector.m_nElements; i++)
+		{
+			newVector(i) = scalar * vector.m_data[i];
+		}
+		return newVector;
+	};
+
+	friend Vector<T> operator*(const Vector<T> &vector, const T scalar)
 	{
 		Vector<T> newVector = Vector<T>(vector.m_nElements);
 		

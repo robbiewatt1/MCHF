@@ -18,13 +18,13 @@ public:
 
 	~STOnGOrbit();
 
-	int GetK();
+	int GetK() const;
 
-	int GetM();
+	int GetM() const;
 
-	int GetN();
+	int GetN() const;
 
-	double GetNormaliseConstant();
+	double GetNormaliseConstant() const;
 
 	GaussianOrbital GetBaseOribtal(int i) const;
 
@@ -34,16 +34,19 @@ public:
 
 public:
 
-	double Overlap(const STOnGOrbit &orbit);
+	double Overlap(const STOnGOrbit &orbit) const;
 	// Calculate the overlap intergral of the two orbirtsals
 
-	double KineticOverlap(const STOnGOrbit &orbit);
+	double KineticOverlap(const STOnGOrbit &orbit) const;
 	// Calculates the kinetic overlap of the two orbitals. This includes the -0.5
 
 	double NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge,
-						  const Vector<double> &nuclearPosition, const BoysFunction &boyFn);
+						  const Vector<double> &nuclearPosition, const BoysFunction &boyFn) const;
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
+
+	Vector<double> MatrixElement(const STOnGOrbit &orbit) const;
+	// Caculates the 3 components of the matrix element
 
 	Array3D<double> CalculateDataCartesian(const Vector<double> &xAxis,
 	                            const Vector<double> &yAxis,

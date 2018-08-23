@@ -23,37 +23,37 @@ GaussianOrbital::~GaussianOrbital()
 {
 }
 
-int GaussianOrbital::GetK()
+int GaussianOrbital::GetK() const
 {
 	return m_k;
 }
 
-int GaussianOrbital::GetM()
+int GaussianOrbital::GetM() const
 {
 	return m_m;
 }
 
-int GaussianOrbital::GetN()
+int GaussianOrbital::GetN() const
 {
 	return m_n;
 }
 
-double GaussianOrbital::GetAlpha()
+double GaussianOrbital::GetAlpha() const
 {
 	return m_alpha;
 }
 
-double GaussianOrbital::GetPositionX()
+double GaussianOrbital::GetPositionX() const
 {
 	return m_orbitPosition[0];
 }
 
-double GaussianOrbital::GetNormaliseConstant()
+double GaussianOrbital::GetNormaliseConstant() const
 {
 	return m_normaliseConstant;
 }
 
-double GaussianOrbital::Overlap(const GaussianOrbital &orbit)
+double GaussianOrbital::Overlap(const GaussianOrbital &orbit) const
 {
 	double gamma  = m_alpha + orbit.m_alpha;
 	Vector<double> positionP(3);
@@ -78,7 +78,7 @@ double GaussianOrbital::Overlap(const GaussianOrbital &orbit)
 	return overlap * m_normaliseConstant * orbit.m_normaliseConstant;
 }
 
-double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
+double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit) const
 {
 	double overlap = this->Overlap(orbit) / (m_normaliseConstant * orbit.m_normaliseConstant);
 	double plus2k  = this->Overlap(orbit.ChangeK(2)) / (m_normaliseConstant * orbit.ChangeK(2).m_normaliseConstant);
@@ -107,7 +107,7 @@ double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit)
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
-                                       const Vector<double> &nuclearPosition, const BoysFunction &boyFn)
+                                       const Vector<double> &nuclearPosition, const BoysFunction &boyFn) const
 {
 	double gamma  = m_alpha + orbit.m_alpha;
 	Vector<double> positionP(3);
@@ -183,6 +183,21 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 		   * m_normaliseConstant * orbit.m_normaliseConstant;
 }
 
+Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) const
+{
+	Vector<double> matrixElements(3);
+	GaussianOrbital xAdd1 = orbit.ChangeK(1);
+	GaussianOrbital yAdd1 = orbit.ChangeM(1);
+	GaussianOrbital zAdd1 = orbit.ChangeN(1);
+	matrixElements[0] = this->Overlap(xAdd1) * orbit.GetNormaliseConstant() 
+											 / xAdd1.GetNormaliseConstant();
+	matrixElements[1] = this->Overlap(yAdd1) * orbit.GetNormaliseConstant() 
+											 / yAdd1.GetNormaliseConstant();
+	matrixElements[2] = this->Overlap(zAdd1) * orbit.GetNormaliseConstant() 
+											 / zAdd1.GetNormaliseConstant();
+	return matrixElements;
+}
+
 Array3D<double> GaussianOrbital::CalculateDataCartesian(const Vector<double> &xAxis,
         const Vector<double> &yAxis,
         const Vector<double> &zAxis)
@@ -248,7 +263,7 @@ void GaussianOrbital::Normalise()
 	m_normaliseConstant = std::sqrt(1.0 / overlap);
 }
 
-double GaussianOrbital::OverlapFunction(int l1, int l2, double gamma, double posA, double posB)
+double GaussianOrbital::OverlapFunction(int l1, int l2, double gamma, double posA, double posB) const
 {
 	int maxSum = (l1 + l2) / 2;
 	double sum(0);
@@ -261,7 +276,7 @@ double GaussianOrbital::OverlapFunction(int l1, int l2, double gamma, double pos
 }
 
 double GaussianOrbital::NuclearFunction(int l, int r, int i, int l1, int l2, double alpha,
-                                        double beta, double posA, double posB, double posC)
+                                        double beta, double posA, double posB, double posC) const
 {
 	double gamma = alpha + beta;
 	double epsilon = 1.0 / (4.0 * gamma);
@@ -302,7 +317,7 @@ double GaussianOrbital::GaussianProduct2(int k, int l1, int l2, double pos1, dou
 	return sum;
 }
 
-double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2)
+double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2) const
 {
 	double sum(0);
 	int minSum = std::max(0, k - l2);

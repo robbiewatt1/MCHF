@@ -107,27 +107,22 @@ Array3D<double> Molecule::CalculateWavefunction(int level)
 	return wavefunction;
 }
 
-double Molecule::CaculateMatrixElement(int level1, int level2)
+Vector<double> Molecule::MatrixElement(int level1, int level2)
 {
-	Array3D<double> overlap = Array3D<double>(m_xAxis.Length(), m_yAxis.Length(), m_zAxis.Length());
-	Array3D<double> wavefunction1 = CalculateWavefunction(level1);
-	Array3D<double> wavefunction2 = CalculateWavefunction(level2);
-	overlap = wavefunction1 * wavefunction1;
-
-	for (int i = 0; i < m_xAxis.Length(); i++)
+	Vector<double> matrixElement(3);
+	if (m_energyLevels.Length() == 0)
 	{
-		for (int j = 0; j < m_yAxis.Length(); j++)
+		std::cerr << "Error: Must first call CalculateEnergy to set energy levels" << std::endl;
+		std::exit(-1);
+	}
+	for (int i = 0; i < m_basisSet.Length(); i++)
+	{
+		for (int j = 0; j < m_basisSet.Length(); j++)
 		{
-			for (int k = 0; k < m_zAxis.Length(); k++)
-			{
-				double r = std::sqrt(std::pow(m_xAxis[i], 2.0) + std::pow(m_yAxis[j], 2.0) 
-									 + std::pow(m_zAxis[k], 2.0));
-				overlap[i][j][k] = wavefunction1[i][j][k] * wavefunction2[i][j][k];
-			}
+			matrixElement = matrixElement + m_basisSet[i].MatrixElement(m_basisSet[j])
+						  * std::abs(m_basisSetCoefficients[i][level1] * m_basisSetCoefficients[j][level2]);
 		}
 	}
-
-	double matrixElement = Numerics::SimpsonsRule3D(m_xAxis, m_xAxis, m_xAxis, overlap);
 	return matrixElement;
 }
 
@@ -224,20 +219,23 @@ void Molecule::SetBasisSet()
 					// Now loop over all ion sights
 					for (int i = 0; i < m_nuclearPositions.Length(); i++)
 					{
-						std::string filePath = "./OrbitalData/STO6/" 
+						std::string filePath = "./OrbitalData/6311GSS/" 
 												+ std::to_string((int)m_nuclearCharges[i]) + "/";
 						STOnGOrbit orbital1 = STOnGOrbit(filePath + "S1", k, m, n,
 										     m_nuclearPositions[i]);
-						//STOnGOrbit orbital2 = STOnGOrbit(filePath + "S2", k, m, n,
-						//				     m_nuclearPositions[i]);
-						//STOnGOrbit orbital3 = STOnGOrbit(filePath + "S3", k, m, n,
-						//		     m_nuclearPositions[i]);
-						//STOnGOrbit orbital4 = STOnGOrbit(filePath + "P1", k, m, n,
-						//				     m_nuclearPositions[i]);
+						STOnGOrbit orbital2 = STOnGOrbit(filePath + "S2", k, m, n,
+										     m_nuclearPositions[i]);
+						STOnGOrbit orbital3 = STOnGOrbit(filePath + "S3", k, m, n,
+								     m_nuclearPositions[i]);
+						STOnGOrbit orbital4 = STOnGOrbit(filePath + "S4", k, m, n,
+										     m_nuclearPositions[i]);
+						STOnGOrbit orbital5 = STOnGOrbit(filePath + "P1", k, m, n,
+										     m_nuclearPositions[i]);
 						m_basisSet.Append(orbital1);
-						//m_basisSet.Append(orbital2);
-						//m_basisSet.Append(orbital3);
-						//m_basisSet.Append(orbital4);
+						m_basisSet.Append(orbital2);
+						m_basisSet.Append(orbital3);
+						m_basisSet.Append(orbital4);
+						m_basisSet.Append(orbital5);						
 					}
 				}
 			}

@@ -4,7 +4,6 @@ cmake_install.cmake
 CMakeFiles
 CMakeLists.txt
 MO
-OutputData
 *.dat
 *.h5
 *.png

@@ -15,34 +15,36 @@ public:
 
 	~GaussianOrbital();
 
-	int GetK();
+	int GetK() const;
 
-	int GetM();
+	int GetM() const;
 
-	int GetN();
+	int GetN() const;
 
-	double GetAlpha();
+	double GetAlpha() const;
 
-	double GetPositionX();
+	double GetPositionX() const;
 
-	double GetPositionY();
+	double GetPositionY() const;
 
-	double GetPositionZ();
+	double GetPositionZ() const;
 
-	double GetNormaliseConstant();
+	double GetNormaliseConstant() const;
 
 public:
 
-	double Overlap(const GaussianOrbital &orbit);
+	double Overlap(const GaussianOrbital &orbit) const;
 	// Calculate the overlap intergral of the two orbirtsals
 
-	double KineticOverlap(const GaussianOrbital &orbit);
+	double KineticOverlap(const GaussianOrbital &orbit) const;
 	// Calculates the kinetic overlap of the two orbitals. This includes the -0.5
 
 	double NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
-	                      const Vector<double> &nuclearPosition, const BoysFunction &boyFn);
+	                      const Vector<double> &nuclearPosition, const BoysFunction &boyFn) const;
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
+
+	Vector<double> MatrixElement(const GaussianOrbital &orbit) const;
 
 	Array3D<double> CalculateDataCartesian(const Vector<double> &xAxis,
 	                            const Vector<double> &yAxis,
@@ -60,12 +62,12 @@ public:
 	void Normalise();
 	// Normalises the wavefunction, and sets the norm constant. uses the overlap of the orbit with itself
 
-	double OverlapFunction(int l1, int l2, double gamma, double posA, double posB);
+	double OverlapFunction(int l1, int l2, double gamma, double posA, double posB) const;
 
 	double NuclearFunction(int l, int r, int i, int l1, int l2, double alpha, double beta,
-	                       double pos1, double pos2, double pos3);
+	                       double pos1, double pos2, double pos3) const;
 
-	double GaussianProduct(int k, int l1, int l2, double pos1, double pos2);
+	double GaussianProduct(int k, int l1, int l2, double pos1, double pos2) const;
 
 	double GaussianProduct2(int k, int l1, int l2, double pos1, double pos2);
 

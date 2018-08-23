@@ -26,7 +26,7 @@ public:
 
 	void CalculateEnergy();
 
-	double CaculateMatrixElement(int level1, int level2);
+	Vector<double> MatrixElement(int level1, int level2);
 
 	void SetXAxis(const Vector<double> &xAxis);
 
