@@ -75,35 +75,35 @@ double GaussianOrbital::Overlap(const GaussianOrbital &orbit) const
 	                                  orbit.m_orbitPosition[2] - positionP[2]);
 	double overlap = std::exp(-1 * m_alpha * orbit.m_alpha * posAB2 / gamma)
 	                 * overlapX * overlapY * overlapZ;
-	return overlap * m_normaliseConstant * orbit.m_normaliseConstant;
+	return overlap;
 }
 
 double GaussianOrbital::KineticOverlap(const GaussianOrbital &orbit) const
 {
-	double overlap = this->Overlap(orbit) / (m_normaliseConstant * orbit.m_normaliseConstant);
-	double plus2k  = this->Overlap(orbit.ChangeK(2)) / (m_normaliseConstant * orbit.ChangeK(2).m_normaliseConstant);
-	double plus2m  = this->Overlap(orbit.ChangeM(2)) / (m_normaliseConstant * orbit.ChangeM(2).m_normaliseConstant);
-	double plus2n  = this->Overlap(orbit.ChangeN(2)) / (m_normaliseConstant * orbit.ChangeN(2).m_normaliseConstant);
+	double overlap = this->Overlap(orbit);
+	double plus2k  = this->Overlap(orbit.ChangeK(2));
+	double plus2m  = this->Overlap(orbit.ChangeM(2));
+	double plus2n  = this->Overlap(orbit.ChangeN(2));
 	double minus2K(0), minus2M(0), minus2N(0);
 
 	if (orbit.m_k > 1)
 	{
-		minus2K = this->Overlap(orbit.ChangeK(-2)) / (m_normaliseConstant * orbit.ChangeK(-2).m_normaliseConstant);
+		minus2K = this->Overlap(orbit.ChangeK(-2));
 	}
 	if (orbit.m_m > 1)
 	{
-		minus2M = this->Overlap(orbit.ChangeM(-2)) / (m_normaliseConstant * orbit.ChangeM(-2).m_normaliseConstant);
+		minus2M = this->Overlap(orbit.ChangeM(-2));
 	}
 	if (orbit.m_n > 1)
 	{
-		minus2N = this->Overlap(orbit.ChangeN(-2)) / (m_normaliseConstant * orbit.ChangeN(-2).m_normaliseConstant);
+		minus2N = this->Overlap(orbit.ChangeN(-2));
 	}
 	double kinOverlap = (orbit.m_alpha * (2.0 * (orbit.m_k + orbit.m_m + orbit.m_n) + 3.0) * overlap)
 	                    - (2.0 * std::pow(orbit.m_alpha, 2.0) * (plus2k + plus2m + plus2n))
 	                    - (0.5 * (orbit.m_k * (orbit.m_k - 1.0) * minus2K
 	                              + orbit.m_m * (orbit.m_m - 1.0) * minus2M
 	                              + orbit.m_n * (orbit.m_n - 1.0) * minus2N));
-	return kinOverlap * m_normaliseConstant * orbit.m_normaliseConstant;
+	return kinOverlap;
 }
 
 double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclearCharge,
@@ -179,8 +179,7 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 			}
 		}
 	}
-	return (-2.0 * Constants::pi / gamma) * exponetialFactor * sum * nuclearCharge 
-		   * m_normaliseConstant * orbit.m_normaliseConstant;
+	return (-2.0 * Constants::pi / gamma) * exponetialFactor * sum * nuclearCharge;
 }
 
 Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) const
@@ -189,12 +188,9 @@ Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) cons
 	GaussianOrbital xAdd1 = orbit.ChangeK(1);
 	GaussianOrbital yAdd1 = orbit.ChangeM(1);
 	GaussianOrbital zAdd1 = orbit.ChangeN(1);
-	matrixElements[0] = this->Overlap(xAdd1) * orbit.GetNormaliseConstant() 
-											 / xAdd1.GetNormaliseConstant();
-	matrixElements[1] = this->Overlap(yAdd1) * orbit.GetNormaliseConstant() 
-											 / yAdd1.GetNormaliseConstant();
-	matrixElements[2] = this->Overlap(zAdd1) * orbit.GetNormaliseConstant() 
-											 / zAdd1.GetNormaliseConstant();
+	matrixElements[0] = this->Overlap(xAdd1);
+	matrixElements[1] = this->Overlap(yAdd1);
+	matrixElements[2] = this->Overlap(zAdd1);
 	return matrixElements;
 }
 
@@ -286,35 +282,6 @@ double GaussianOrbital::NuclearFunction(int l, int r, int i, int l1, int l2, dou
 	                * std::pow(epsilon, r + i) / (Functions::Factorial(r) * Functions::Factorial(i)
 	                        * Functions::Factorial(l - (2.0 * r) - (2 * i)));
 	return result;
-}
-
-double GaussianOrbital::GaussianProduct3(int k, int l1, int l2, double pos1, double pos2)
-{
-	int maxSum = std::min(k, 2 * l1 - k);
-	int minSum = std::max(-k, k - 2 * l2);
-	double sum(0);
-	for (int q = minSum; q <= maxSum; q = q + 2)
-	{
-		int i = (k + q) / 2;
-		int j = (k - q) / 2;
-		sum += Functions::BinomialCoefficient(l1, i) * Functions::BinomialCoefficient(l2, j)
-		       * std::pow(pos1, l1 - i) * std::pow(pos2, l2 - j);
-	}
-	return sum;
-}
-
-double GaussianOrbital::GaussianProduct2(int k, int l1, int l2, double pos1, double pos2)
-{
-	double sum(0);
-	for (int i = 0; i <= l1; i++)
-	{
-		for (int j = k - i; j <= l2; j++)
-		{
-			sum += Functions::BinomialCoefficient(l1, i) * Functions::BinomialCoefficient(l2, j)
-			       * std::pow(pos1, l1 - i) * std::pow(pos2, l2 - j);
-		}
-	}
-	return sum;
 }
 
 double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2) const

@@ -12,13 +12,6 @@
 
 int main(int argc, char* argv[])
 {
-//	Vector<double> pos(3);
-//	pos[0] = 0.0;
-//	pos[1] = 0.0;
-//	pos[2] = 0.0;
-//	GaussianOrbital test = GaussianOrbital(0,0,0,1.0,pos);
-//	GaussianOrbital test2 = GaussianOrbital(1,0,0,1.0,pos);
-//	std::cout << test.MatrixElement(test2)[0] << " " << test.MatrixElement(test2)[1] << " " << test.MatrixElement(test2)[2] << std::endl;
 	if(argc != 2)
 	{
 		std::cerr << "ERROR: Incorrect use of " << argv[0] << std::endl;
@@ -48,8 +41,8 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 1;
-	int maxU = 1000000;
+	int maxL = 7;
+	int maxU = 100;
 	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
 	std::ofstream outfile("./OutputData/testMe.dat");
 	for(int i = 10; i >= 1; i--)
@@ -61,10 +54,9 @@ int main(int argc, char* argv[])
 		Vector<double> me = mol.MatrixElement(0,1);
 		Vector<double> me2 = mol.MatrixElement(0,2);
 		Vector<double> me3 = mol.MatrixElement(0,3);
-		mol.GetEnergyLevels().Print();
-		me.Print();
-		me2.Print();
-		me3.Print();
+		std::cout << mol.GetEnergyLevels()[0] << std::endl;
+		std::cout << (me[0] * me[0] + me[1] * me[1] + me[2] * me[2]) + (me2[0] * me2[0] + me2[1] * me2[1] + me2[2] * me2[2]) + (me3[0] * me3[0] + me3[1] * me3[1] + me3[2] * me3[2]) << std::endl;
+
 		outfile << positions[0][0] << "\t" << me[0] << "\t" << me[1] << "\t" << me[2] << std::endl;
 		//outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << std::endl;
 			//	<<  mol.GetEnergyLevels()[2] << "\t" << mol.GetEnergyLevels()[3] << "\t" << mol.GetEnergyLevels()[4]  
@@ -73,24 +65,5 @@ int main(int argc, char* argv[])
 	//	std::cout <<positions[0][0] << " " << mol.GetEnergyLevels()[0] << " " << mol.GetEnergyLevels()[1] << " " << mol.GetEnergyLevels()[2] << mol.GetEnergyLevels()[3] << " " << mol.GetEnergyLevels()[4] << " " << mol.GetEnergyLevels()[5] << std::endl;
 
 	}
-
-
-
-/*
-    int maxL = 2;
-    int maxU = 1000000;
-    BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
-
-    std::ofstream file("./test");
-	for (int i = 0; i < 4; ++i)
-	{
-		for (int j = 0; j < 1000; ++j)
-		{
-			file << boyFn.Interpolate(i,j) << "\t";
-		}
-		file << "\n";
-	}
-*/	
-
 	return 0;
 }

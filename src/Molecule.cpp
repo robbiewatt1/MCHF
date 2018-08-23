@@ -16,7 +16,7 @@ Molecule::Molecule(const Vector<double> &nuclearCharges,
 	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
 {
 	SetBasisSet();
-	m_boyFn = boyFn; // 10 x seems good enough for roughly 10^-7 
+	m_boyFn = boyFn;
 }
 
 Molecule::~Molecule()
@@ -62,16 +62,9 @@ void Molecule::CalculateEnergy()
 				nuclearPotential += m_basisSet[i].NuclearOverlap(m_basisSet[j],
 				                    m_nuclearCharges[k],
 									m_nuclearPositions[k], m_boyFn);
-								//	* m_basisSet[j].GetNormaliseConstant()
-								//	* m_basisSet[i].GetNormaliseConstant();
 			}
 			double kineticEnergy = m_basisSet[i].KineticOverlap(m_basisSet[j]);
-								  // * m_basisSet[i].GetNormaliseConstant()
-								 //  * m_basisSet[j].GetNormaliseConstant();
-
 			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j]);
-								 // * m_basisSet[i].GetNormaliseConstant()
-			                     // * m_basisSet[j].GetNormaliseConstant();
 			energyMaxtrix[i][j] = kineticEnergy + nuclearPotential + potential * overlapMatrix[i][j];
 
 			// Matrix is symetric
@@ -120,7 +113,7 @@ Vector<double> Molecule::MatrixElement(int level1, int level2)
 		for (int j = 0; j < m_basisSet.Length(); j++)
 		{
 			matrixElement = matrixElement + m_basisSet[i].MatrixElement(m_basisSet[j])
-						  * std::abs(m_basisSetCoefficients[i][level1] * m_basisSetCoefficients[j][level2]);
+						  * (m_basisSetCoefficients[i][level1] * m_basisSetCoefficients[j][level2]);
 		}
 	}
 	return matrixElement;

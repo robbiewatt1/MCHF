@@ -171,7 +171,6 @@ Matrix<double> LinearAlgebra::CholeskyDecomposition(const Matrix<double> &matrix
 	return lowerMatrix;
 }
 
-
 void LinearAlgebra::LUPDecomposition(Matrix<double> &luMatrix, Vector<int> &rowPermutaions, int &rowChanges)
 {
 	rowChanges = 1;

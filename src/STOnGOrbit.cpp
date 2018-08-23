@@ -68,9 +68,9 @@ double STOnGOrbit::Overlap(const STOnGOrbit &orbit) const
 		{
 			overlap += m_baseOrbitalVector[i].Overlap(orbit.GetBaseOribtal(j)) 
 						* m_coefficeints[i] * orbit.m_coefficeints[j]
-						* m_normaliseConstant * orbit.m_normaliseConstant;						
-					//	* m_baseOrbitalVector[i].GetNormaliseConstant()
-					//	* orbit.GetBaseOribtal(j).GetNormaliseConstant();
+						* m_normaliseConstant * orbit.m_normaliseConstant
+						* m_baseOrbitalVector[i].GetNormaliseConstant()
+						* orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}
 	}
 	return overlap;
@@ -85,9 +85,9 @@ double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit) const
 		{
 			knieticEnergy += m_baseOrbitalVector[i].KineticOverlap(orbit.GetBaseOribtal(j)) 
 							 * m_coefficeints[i] * orbit.m_coefficeints[j]
-							 * m_normaliseConstant * orbit.m_normaliseConstant;
-							// * m_baseOrbitalVector[i].GetNormaliseConstant()
-							// * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+							 * m_normaliseConstant * orbit.m_normaliseConstant
+							 * m_baseOrbitalVector[i].GetNormaliseConstant()
+							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}
 	}
 	return knieticEnergy;
@@ -104,9 +104,9 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge,
 			potentialEnergy += m_baseOrbitalVector[i].NuclearOverlap(orbit.GetBaseOribtal(j), 
 									nuclearCharge, nuclearPosition, boyFn)
 							 * m_coefficeints[i] * orbit.m_coefficeints[j]
-							 * m_normaliseConstant * orbit.m_normaliseConstant;
-							// * m_baseOrbitalVector[i].GetNormaliseConstant()
-							// * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+							 * m_normaliseConstant * orbit.m_normaliseConstant
+							 * m_baseOrbitalVector[i].GetNormaliseConstant()
+							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
 		}
 	}
 	return potentialEnergy;
@@ -121,7 +121,9 @@ Vector<double> STOnGOrbit::MatrixElement(const STOnGOrbit &orbit) const
 		{
 			matrixElements = matrixElements + m_baseOrbitalVector[i].MatrixElement(orbit.GetBaseOribtal(j))
 						 	* m_coefficeints[i] * orbit.m_coefficeints[j]
-						 	* m_normaliseConstant * orbit.m_normaliseConstant;
+						 	* m_normaliseConstant * orbit.m_normaliseConstant
+							* m_baseOrbitalVector[i].GetNormaliseConstant()
+							* orbit.GetBaseOribtal(j).GetNormaliseConstant();						 	
 		}
 	}
 	return matrixElements;
@@ -160,7 +162,9 @@ void STOnGOrbit::Normalise()
 		for (int j = 0; j < m_gaussianNumber; j++)
 		{
 			overlap += m_baseOrbitalVector[i].Overlap(m_baseOrbitalVector[j]) 
-						* m_coefficeints[i] * m_coefficeints[j];
+						* m_coefficeints[i] * m_coefficeints[j]
+						* m_baseOrbitalVector[i].GetNormaliseConstant()
+						* m_baseOrbitalVector[j].GetNormaliseConstant();
 		}
 	}
 	m_normaliseConstant = std::sqrt(1.0 / overlap);
