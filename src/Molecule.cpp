@@ -17,7 +17,7 @@ Molecule::Molecule(const Vector<double> &nuclearCharges,
                    const Vector<Vector<double>> &nuclearPositions, int maxL, const BoysFunction &boyFn):
 	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
 {
-	SetBasisSet("./OrbitalData/STO6/" );
+	SetBasisSet("./OrbitalData/6311GSS/");
 	m_boyFn = boyFn;
 }
 
@@ -74,10 +74,47 @@ void Molecule::CalculateEnergy()
 			energyMaxtrix[j][i] = energyMaxtrix[i][j];
 		}
 	}
-	m_energyLevels = Vector<double>(m_basisSet.Length());
-	m_basisSetCoefficients = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
-	LinearAlgebra::GeneralisedEigenSolver(energyMaxtrix, overlapMatrix, m_basisSetCoefficients,
-                                      m_energyLevels);
+	// When large number of basis sets are used, it is likely that the overlpa matrix is singular
+	// Therefore this needs to be cvheck and sorted
+	Vector<double> overlapValues = Vector<double>(m_basisSet.Length());
+	Matrix<double> overlapVector = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
+	LinearAlgebra::EigenSolver(overlapMatrix, overlapVector, overlapValues);
+	// eigen values that are smaller than 1e-10 are removed giving a new rectangle overlap matrix.
+
+	double small = 1e-12 * overlapValues.End();
+	
+	Vector<double> reducedOVal;
+	int dif(0);
+	for (int i = 0; i <overlapValues.Length(); i++)
+	{
+		if(overlapValues[i] > small)
+		{
+			reducedOVal.Append(overlapValues[i]);
+		} else
+		{
+			dif++;
+		}
+	}
+	std::cout << reducedOVal.Length() << " ";
+	std::cout << small << std::endl;
+
+	Matrix<double> reducedOVec = Matrix<double>(m_basisSet.Length(), reducedOVal.Length());
+
+
+	for (int i = 0; i < reducedOVec.GetRows(); i++)
+	{
+		for (int j = 0; j < reducedOVec.GetColumns(); j++)
+		{
+			reducedOVec[i][j] = overlapVector[i][j+dif] / std::sqrt(reducedOVal[j]);
+		}
+	}
+
+	m_energyLevels = Vector<double>(reducedOVal.Length());
+	m_basisSetCoefficients = Matrix<double>(reducedOVal.Length(),reducedOVal.Length());
+	Matrix<double> reducedEnergy = LinearAlgebra::Transpose(reducedOVec) * energyMaxtrix * (reducedOVec);
+	LinearAlgebra::EigenSolver(reducedEnergy,m_basisSetCoefficients, m_energyLevels);
+
+//	m_energyLevels.Print();
 }
 
 Vector<double> Molecule::MatrixElement(int level1, int level2)

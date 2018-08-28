@@ -84,12 +84,12 @@ Vector<double> LinearAlgebra::TruncateUpper(const Vector<double> &vector, int in
 
 Matrix<double> LinearAlgebra::Transpose(const Matrix<double> &matrix)
 {
-	Matrix<double> transpose(matrix.GetRows(), matrix.GetColumns());
+	Matrix<double> transpose(matrix.GetColumns(), matrix.GetRows());
 	for (int i = 0; i < matrix.GetRows(); i++)
 	{
 		for (int j = 0; j < matrix.GetColumns(); j++)
 		{
-			transpose[i][j] = matrix[j][i];
+			transpose[j][i] = matrix[i][j];
 		}
 	}
 	return transpose;
@@ -274,8 +274,8 @@ void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, con
 		}
 	}
 }
-/*
 
+/*
 void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, const Matrix<double> &matrixRight,
         Matrix<double> &eigenVectors, Vector<double> &eigenvalues)
 {
@@ -293,8 +293,6 @@ void LinearAlgebra::GeneralisedEigenSolver(const Matrix<double> &matrixLeft, con
 	eigenVectors.Print();
 
 }
-
-
 
 void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors, Vector<double> &eigenValues,
                                 int nrot, int maxSweeps)
