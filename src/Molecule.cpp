@@ -14,10 +14,11 @@ Molecule::Molecule()
 }
 
 Molecule::Molecule(const Vector<double> &nuclearCharges,
-                   const Vector<Vector<double>> &nuclearPositions, int maxL, const BoysFunction &boyFn):
+                   const Vector<Vector<double>> &nuclearPositions, int maxL,
+                   const BoysFunction &boyFn, std::string basisSetDir):
 	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
 {
-	SetBasisSet("./OrbitalData/6311GSS/");
+	SetBasisSet(basisSetDir);
 	m_boyFn = boyFn;
 }
 

@@ -186,7 +186,6 @@ Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) cons
 {
 	
 	Vector<double> matrixElements(3);
-
 	double plusK  = this->Overlap(orbit.ChangeK(1));
 	double plusM  = this->Overlap(orbit.ChangeM(1));
 	double plusN  = this->Overlap(orbit.ChangeN(1));
@@ -203,20 +202,9 @@ Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) cons
 	{
 		minusN = this->Overlap(orbit.ChangeN(-1));
 	}
-
 	matrixElements[0] = orbit.m_k * minusK - 2 * orbit.m_alpha * plusK;
 	matrixElements[1] = orbit.m_m * minusM - 2 * orbit.m_alpha * plusM;
 	matrixElements[2] = orbit.m_n * minusN - 2 * orbit.m_alpha * plusN;
-/*	
-	GaussianOrbital xAdd1 = orbit.ChangeK(1);
-	GaussianOrbital yAdd1 = orbit.ChangeM(1);
-	GaussianOrbital zAdd1 = orbit.ChangeN(1);
-	
-
-	matrixElements[0] = this->Overlap(xAdd1);
-	matrixElements[1] = this->Overlap(yAdd1);
-	matrixElements[2] = this->Overlap(zAdd1);
-	*/
 	return matrixElements;
 }
 

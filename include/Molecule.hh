@@ -16,7 +16,7 @@ public:
 	Molecule();
 
 	Molecule(const Vector<double> &nuclearCharges, const Vector<Vector<double>> &nuclearPositions,
-	         int maxL, const BoysFunction &boyFn);
+	         int maxL, const BoysFunction &boyFn, std::string basisSetDir);
 
 	~Molecule();
 
