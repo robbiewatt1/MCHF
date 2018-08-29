@@ -1,6 +1,6 @@
 #include <cmath>
 #include <limits>
-#include <Eigenvalues>
+#include <Eigen/Eigenvalues>
 
 #include "LinearAlgebra.hh"
 #include "Vector.hh"

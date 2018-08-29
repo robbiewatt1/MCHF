@@ -4,6 +4,8 @@ cmake_install.cmake
 CMakeFiles
 CMakeLists.txt
 MO
+*.swp
+*.swo
 *.dat
 *.h5
 *.png

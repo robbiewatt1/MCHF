@@ -41,15 +41,15 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 2;
-	int maxU = std::pow(2,20);
-	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 64*maxU);
-	std::ofstream outfile("./OutputData/C2+OscStr.dat");
-	for(int i = 50; i >= 1; i--)
+	int maxL = 1;
+	int maxU = std::pow(2,22);
+	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 16*maxU);
+	std::ofstream outfile("./OutputData/CarbonEnergy.dat");
+	for(int i = 1000; i >= 1; i--)
 	{
 		std::cout << i << std::endl;
-		positions[0][0] = (double)i / 5.0;
-		Molecule mol = Molecule(charges, positions, maxL, boyFn, "./OrbitalData/6311GSS/");
+		positions[0][0] = (double)i / 20.0;
+		Molecule mol = Molecule(charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
 		mol.CalculateEnergy();
 		double me  = mol.OscilatorStrength(0,1);
 
