@@ -41,22 +41,22 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 3;
-	int maxU = 10000;
-	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 1000*maxU);
-	std::ofstream outfile("./OutputData/H2+OscStr.dat");
-	for(int i = 20; i >= 1; i--)
+	int maxL = 1;
+	int maxU = 1000000;
+	BoysFunction boyFn = BoysFunction(2 * maxL, maxU, 100*maxU);
+	std::ofstream outfile("./OutputData/C2+OscStr.dat");
+	for(int i = 100; i >= 1; i--)
 	{
-		srand((unsigned int) time(0));
+		std::cout << i << std::endl;
 		positions[0][0] = (double)i / 5.0;
 		Molecule mol = Molecule(charges, positions, maxL, boyFn);
 		mol.CalculateEnergy();
-//		double me  = mol.OscilatorStrength(0,1);
+		double me  = mol.OscilatorStrength(0,1);
 //		double me2 = mol.OscilatorStrength(0,2);
 //		double me3 = mol.OscilatorStrength(0,3);
 //		mol.GetEnergyLevels().Print();
 
-		outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << std::endl;
+		outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << me << std::endl;
 	}
 	return 0;
 }

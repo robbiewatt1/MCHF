@@ -184,13 +184,39 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 
 Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) const
 {
+	
 	Vector<double> matrixElements(3);
+
+	double plusK  = this->Overlap(orbit.ChangeK(1));
+	double plusM  = this->Overlap(orbit.ChangeM(1));
+	double plusN  = this->Overlap(orbit.ChangeN(1));
+	double minusK(0), minusM(0), minusN(0);
+	if (orbit.m_k > 0)
+	{
+		minusK = this->Overlap(orbit.ChangeK(-1));
+	}
+	if (orbit.m_m > 0)
+	{
+		minusM = this->Overlap(orbit.ChangeM(-1));
+	}
+	if (orbit.m_n > 0)
+	{
+		minusN = this->Overlap(orbit.ChangeN(-1));
+	}
+
+	matrixElements[0] = orbit.m_k * minusK - 2 * orbit.m_alpha * plusK;
+	matrixElements[1] = orbit.m_m * minusM - 2 * orbit.m_alpha * plusM;
+	matrixElements[2] = orbit.m_n * minusN - 2 * orbit.m_alpha * plusN;
+/*	
 	GaussianOrbital xAdd1 = orbit.ChangeK(1);
 	GaussianOrbital yAdd1 = orbit.ChangeM(1);
 	GaussianOrbital zAdd1 = orbit.ChangeN(1);
+	
+
 	matrixElements[0] = this->Overlap(xAdd1);
 	matrixElements[1] = this->Overlap(yAdd1);
 	matrixElements[2] = this->Overlap(zAdd1);
+	*/
 	return matrixElements;
 }
 

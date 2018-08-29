@@ -75,14 +75,12 @@ void Molecule::CalculateEnergy()
 		}
 	}
 	// When large number of basis sets are used, it is likely that the overlpa matrix is singular
-	// Therefore this needs to be cvheck and sorted
-	Vector<double> overlapValues = Vector<double>(m_basisSet.Length());
-	Matrix<double> overlapVector = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
+	// Therefore this needs to be check and sorted
+	Vector<double> overlapValues;
+	Matrix<double> overlapVector;
 	LinearAlgebra::EigenSolver(overlapMatrix, overlapVector, overlapValues);
-	// eigen values that are smaller than 1e-10 are removed giving a new rectangle overlap matrix.
-
-	double small = 1e-12 * overlapValues.End();
-	
+	// eigen values that are smaller than 1e-12 are removed giving a new rectangle overlap matrix.
+	double small = 1e-7 * overlapValues.End();
 	Vector<double> reducedOVal;
 	int dif(0);
 	for (int i = 0; i <overlapValues.Length(); i++)
@@ -95,12 +93,8 @@ void Molecule::CalculateEnergy()
 			dif++;
 		}
 	}
-	std::cout << reducedOVal.Length() << " ";
-	std::cout << small << std::endl;
-
+	std::cout << "discared: " << dif << std::endl;
 	Matrix<double> reducedOVec = Matrix<double>(m_basisSet.Length(), reducedOVal.Length());
-
-
 	for (int i = 0; i < reducedOVec.GetRows(); i++)
 	{
 		for (int j = 0; j < reducedOVec.GetColumns(); j++)
@@ -109,12 +103,9 @@ void Molecule::CalculateEnergy()
 		}
 	}
 
-	m_energyLevels = Vector<double>(reducedOVal.Length());
-	m_basisSetCoefficients = Matrix<double>(reducedOVal.Length(),reducedOVal.Length());
 	Matrix<double> reducedEnergy = LinearAlgebra::Transpose(reducedOVec) * energyMaxtrix * (reducedOVec);
 	LinearAlgebra::EigenSolver(reducedEnergy,m_basisSetCoefficients, m_energyLevels);
-
-//	m_energyLevels.Print();
+	m_basisSetCoefficients = reducedOVec * m_basisSetCoefficients;
 }
 
 Vector<double> Molecule::MatrixElement(int level1, int level2)
@@ -141,7 +132,7 @@ double Molecule::OscilatorStrength(int level1, int level2)
 	Vector<double> matrixElement = MatrixElement(level1, level2);
 	double mE_2 = matrixElement[0] * matrixElement[0] + matrixElement[1] * matrixElement[1] 
 				+ matrixElement[2] * matrixElement[2];
-	return (2.0 / 3.0) * (m_energyLevels[level2] - m_energyLevels[level1]) * mE_2;
+	return (2.0 / 3.0) * mE_2 / (m_energyLevels[level2] - m_energyLevels[level1]);
 }
 
 Array3D<double> Molecule::CalculateWavefunction(int level)

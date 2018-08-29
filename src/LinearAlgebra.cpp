@@ -226,7 +226,16 @@ void LinearAlgebra::LUPDecomposition(Matrix<double> &luMatrix, Vector<int> &rowP
 void LinearAlgebra::EigenSolver(const Matrix<double> &matrix, Matrix<double> &eigenVectors,
                                  Vector<double> &eigenValues)
 {
+	// Check Matrix is square
+	if (matrix.GetRows() != matrix.GetColumns())
+	{
+		std::cerr << "Error: Matrix is not square. Cannot find eigenvalues" << std::endl;
+		exit(-1);
+	}
+
 	// Need to first get data from Matrix class and map to an Eigen matrix class
+	eigenVectors = Matrix<double>(matrix.GetRows(), matrix.GetColumns());
+	eigenValues  = Vector<double>(matrix.GetRows());
 	Eigen::MatrixXd eMatrix(matrix.GetRows(), matrix.GetColumns());
 	for (int i = 0; i < matrix.GetColumns(); i++)
 	{
