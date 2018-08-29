@@ -182,6 +182,11 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 	return (-2.0 * Constants::pi / gamma) * exponetialFactor * sum * nuclearCharge;
 }
 
+double double ElectronRepulsion(const GaussianOrbital &orbit, const BoysFunction &boyFn)
+{
+	
+}
+
 Vector<double> GaussianOrbital::MatrixElement(const GaussianOrbital &orbit) const
 {
 	

@@ -44,6 +44,10 @@ public:
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
 
+	double ElectronRepulsion(const GaussianOrbital &orbit, const BoysFunction &boyFn) const;
+	// Calculates the repulsion between gaussian orbitals. Only the hartree and fock terms 
+	// are considered
+
 	Vector<double> MatrixElement(const GaussianOrbital &orbit) const;
 
 	Array3D<double> CalculateDataCartesian(const Vector<double> &xAxis,
