@@ -72,9 +72,9 @@ public:
 	double NuclearFunction(int l, int r, int i, int l1, int l2, double alpha, double beta,
 	                       double pos1, double pos2, double pos3) const;
 
-	double ElectronFunction(int l, int l_p, int r1, int r2, int i, int l1, int l2, int l3, int l4,
-							 double alpha1, double alpha2, double beta1, double beta2, 
-							 const Vector<double> &positions) const;
+	double ElectronFunction(int l, int l_p, int r, int r_p, int i, int l1, int l2, double posA,
+							double posB, double posP, double gamma1, int l3, int l4, double posC, 
+							double posD, double posQ, double gamma2) const;
 
 	double ThetaFn(int l, int l1, int l2, double a, double b, double c, double d) const;
 

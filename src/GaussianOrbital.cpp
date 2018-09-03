@@ -213,7 +213,9 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 				  + std::pow(positionP[1] - positionQ[1], 2.0)
 				  + std::pow(positionP[2] - positionQ[2], 2.0);
 
-	double gaussProduct = 2.0 * std::pow(Constants::pi, 2.0) / (gamma1 * gamma2) * std::sqrt(Constants::pi / gamma1 + gamma2)
+	std::cout << posQP2 << " " << posCD2 << " " << posAB2 << std::endl;
+
+	double gaussProduct = 2.0 * std::pow(Constants::pi, 2.0) / (gamma1 * gamma2) * std::sqrt(Constants::pi / (gamma1 + gamma2))
 						* std::exp(-1.0 * (m_alpha * orbit1.m_alpha * posAB2 / gamma1) 
 								+ (-1.0 * (orbit2.m_alpha * orbit3.m_alpha * posCD2 / gamma2)));
 
@@ -221,56 +223,59 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 	int maxK   = m_k + orbit1.m_k;
 	int maxK_p = orbit2.m_k + orbit3.m_k;
 	int maxM   = m_m + orbit1.m_m;
-	int maxM_P = orbit2.m_k + orbit3.m_k;
+	int maxM_P = orbit2.m_m + orbit3.m_m;
 	int maxN   = m_n + orbit1.m_n;
-	int maxN_p = orbit2.m_k + orbit3.m_k;
-	for (int k = 0; k < maxK; k++)
+	int maxN_p = orbit2.m_n + orbit3.m_n;
+	for (int k = 0; k <= maxK; k++)
 	{
 		int maxR = k / 2;
-		for (int r = 0; r < maxR; r++)
+		for (int r = 0; r <= maxR; r++)
 		{
 			int maxI = (k - 2 * r) / 2;
-			for (int i = 0; i < maxI; i++)
+			for (int i = 0; i <= maxI; i++)
 			{
-				for (int k_p = 0; k_p < maxK_p; k_p++)
+				for (int k_p = 0; k_p <= maxK_p; k_p++)
 				{
 					int maxR_p = k_p / 2;
-					for (int r_p = 0; r_p < maxR_p; r_p++)
+					for (int r_p = 0; r_p <= maxR_p; r_p++)
 					{
 						double Bx = ElectronFunction(k, k_p, r, r_p, i, m_k, orbit1.m_k, m_orbitPosition[0], orbit1.m_orbitPosition[0], positionP[0], gamma1, 
 													 orbit2.m_k, orbit3.m_k, orbit2.m_orbitPosition[0], orbit3.m_orbitPosition[0], positionQ[0], gamma2);
-						for (int m = 0; m < maxM; m++)
+						for (int m = 0; m <= maxM; m++)
 						{
 							int maxS = m / 2;
-							for (int s = 0; s < maxS; s++)
+							for (int s = 0; s <= maxS; s++)
 							{
 								int maxJ = (m - 2 * s) / 2;
-								for (int j = 0; j < maxJ; j++)
+								for (int j = 0; j <= maxJ; j++)
 								{
-									for (int m_p = 0; m_p < maxM_P; m_p++)
+									for (int m_p = 0; m_p <= maxM_P; m_p++)
 									{
 										int maxS_p = m_p / 2;
-										for (int s_p = 0; s_p < maxS_p; s_p++)
+										for (int s_p = 0; s_p <= maxS_p; s_p++)
 										{
 											double By = ElectronFunction(m, m_p, s, s_p, j, m_m, orbit1.m_m, m_orbitPosition[1], orbit1.m_orbitPosition[1], positionP[1], gamma1,
 													 					 orbit2.m_m, orbit3.m_m, orbit2.m_orbitPosition[1], orbit3.m_orbitPosition[1], positionQ[1], gamma2);
-											for (int n = 0; n < maxN; n++)
+											for (int n = 0; n <= maxN; n++)
 											{
 												int maxT = n / 2;
-												for (int t = 0; t < maxT; t++)
+												for (int t = 0; t <= maxT; t++)
 												{
 													int maxL = (n - 2 * t) / 2;
-													for (int l = 0; l < maxL; l++)
+													for (int l = 0; l <= maxL; l++)
 													{
-														for (int n_p = 0; n_p < maxN_p; n_p++)
+														for (int n_p = 0; n_p <= maxN_p; n_p++)
 														{
 															int maxT_p = n_p / 2;
-															for (int t_p = 0; t_p < maxT_p; t_p++)
+															for (int t_p = 0; t_p <= maxT_p; t_p++)
 															{
 																double Bz = ElectronFunction(n, n_p, t, t_p, l, m_n, orbit1.m_n, m_orbitPosition[2], orbit1.m_orbitPosition[2], positionP[2],
 																			gamma1, orbit2.m_n, orbit3.m_n, orbit2.m_orbitPosition[2], orbit3.m_orbitPosition[2], positionQ[2], gamma2);
-																boysIndex = k + k_p + m + m_p + n + n_p - 2 * (r + r_p + s + s_p + t + t_p) - (i + j + l);
+																int boysIndex = k + k_p + m + m_p + n + n_p - 2 * (r + r_p + s + s_p + t + t_p) - (i + j + l);
 																sum += Bx * By * Bz * boyFn.Interpolate(boysIndex, posQP2 / (4.0 * delta));
+														//		std::cout << "Bx " << Bx << std::endl;
+														//		std::cout << "BY " << By << std::endl;
+														//		std::cout << "Bz " << Bz << std::endl;
 															}
 														}
 													}
@@ -281,11 +286,13 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 								}
 							}
 						}
+						std::cout << "\n";
 					}
 				}
 			}
 		}
 	}
+	std::cout << gaussProduct << " " << sum << std::endl;
 	return gaussProduct * sum;
 }
 
@@ -405,36 +412,29 @@ double GaussianOrbital::NuclearFunction(int l, int r, int i, int l1, int l2, dou
 	return result;
 }
 
-double GaussianOrbital::ElectronFunction(int l, int l_p, int r, int r_p, int i, int l1, int l2,
-										 int l3, int l4, double alpha1, double alpha2, double beta1,
-										 double beta2, const Vector<double> &positions) const
+double GaussianOrbital::ElectronFunction(int l, int l_p, int r, int r_p, int i, int l1, int l2, double posA,
+										 double posB, double posP, double gamma1, int l3, int l4, double posC, 
+										 double posD, double posQ, double gamma2) const
 {
-	double gamma1 = alpha1 + beta1; 
-	double gamma2 = alpha2 + beta2;
-	double delta = (1.0 / (4.0 * gamma1)) + (1.0 /(4.0 * gamma2));
-
-	double posP  = (positions[0] * alpha1 + positions[1] * beta1) / gamma1;
-	double posQ  = (positions[2] * alpha2 + positions[3] * beta2) / gamma2;
+	double delta = (1.0 / (4.0 * gamma1)) + (1.0 / (4.0 * gamma2));
 	double posR  = posP - posQ;
-	double posPA = positions[0] - posP;
-	double posPB = positions[1] - posP;
-	double posQC = positions[2] - posQ;
-	double posQD = positions[3] - posP;
-
-
+	double posPA = posA - posP;
+	double posPB = posB - posP;
+	double posQC = posC - posQ;
+	double posQD = posD - posP;
 	double result = std::pow(-1.0, l_p) * ThetaFn(l, l1, l2, posPA, posPB, r, gamma1) 
 				  * ThetaFn(l_p, l3, l4, posQC, posQD, r_p, gamma2) * std::pow(-1.0, i) 
 				  * std::pow(2.0 * delta, 2.0 * (r + r_p)) * Functions::Factorial(l + l_p - 2.0 * (r + r_p))
 				  * std::pow(delta, i) * std::pow(posR, l + l_p - 2.0 * (r + r_p + i))
 				  / (std::pow(4.0 * delta, l + l_p) * Functions::Factorial(i) * 
 				  	Functions::Factorial(l + l_p - 2.0 * (r + r_p + i)));
-
-
+	return result;
 }
 
 double GaussianOrbital::ThetaFn(int l, int l1, int l2, double a, double b, double c, double d) const
 {
-	return GaussianProduct(l, l1, l2, a, b) * Functions::Factorial(l) * std::pow(d, c - l);
+	return GaussianProduct(l, l1, l2, a, b) * Functions::Factorial(l) * std::pow(d, c - l) 
+		   / (Functions::Factorial(c) * Functions::Factorial(l - 2.0 * c));
 }
 
 double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2) const
