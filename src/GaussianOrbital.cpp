@@ -182,7 +182,8 @@ double GaussianOrbital::NuclearOverlap(const GaussianOrbital &orbit, int nuclear
 	return (-2.0 * Constants::pi / gamma) * exponetialFactor * sum * nuclearCharge;
 }
 
-double double ElectronRepulsion(const GaussianOrbital &orbit, const BoysFunction &boyFn)
+double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const GaussianOrbital &orbit2, 
+										  const GaussianOrbital &orbit3, const BoysFunction &boyFn) const
 {
 	
 }
@@ -301,6 +302,38 @@ double GaussianOrbital::NuclearFunction(int l, int r, int i, int l1, int l2, dou
 	                * std::pow(epsilon, r + i) / (Functions::Factorial(r) * Functions::Factorial(i)
 	                        * Functions::Factorial(l - (2.0 * r) - (2 * i)));
 	return result;
+}
+
+double GaussianOrbital::ElectronFunction(int l, int l_p, int r, int r_p, int i, int l1, int l2,
+										 int l3, int l4, double alpha1, double alpha2, double beta1,
+										 double beta2, const Vector<double> &positions) const
+{
+	double gamma1 = alpha1 + beta1; 
+	double gamma2 = alpha2 + beta2;
+	double delta = (1.0 / (4.0 * gamma1)) + (1.0 /(4.0 * gamma2));
+
+	double posP  = (positions[0] * alpha1 + positions[1] * beta1) / gamma1;
+	double posQ  = (positions[2] * alpha2 + positions[3] * beta2) / gamma2;
+	double posR  = posP - posQ;
+	double posPA = positions[0] - posP;
+	double posPB = positions[1] - posP;
+	double posQC = positions[2] - posQ;
+	double posQD = positions[3] - posP;
+
+
+	double result = std::pow(-1.0, l_p) * ThetaFn(l, l1, l2, posPA, posPB, r, gamma1) 
+				  * ThetaFn(l_p, l3, l4, posQC, posQD, r_p, gamma2) * std::pow(-1.0, i) 
+				  * std::pow(2.0 * delta, 2.0 * (r + r_p)) * Functions::Factorial(l + l_p - 2.0 * (r + r_p))
+				  * std::pow(delta, i) * std::pow(posR, l + l_p - 2.0 * (r + r_p + i))
+				  / (std::pow(4.0 * delta, l + l_p) * Functions::Factorial(i) * 
+				  	Functions::Factorial(l + l_p - 2.0 * (r + r_p + i)));
+
+
+}
+
+double GaussianOrbital::ThetaFn(int l, int l1, int l2, double a, double b, double c, double d) const
+{
+	return GaussianProduct(l, l1, l2, a, b) * Functions::Factorial(l) * std::pow(d, c - l);
 }
 
 double GaussianOrbital::GaussianProduct(int k, int l1, int l2, double pos1, double pos2) const

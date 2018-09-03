@@ -44,7 +44,8 @@ public:
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
 
-	double ElectronRepulsion(const GaussianOrbital &orbit, const BoysFunction &boyFn) const;
+	double ElectronRepulsion(const GaussianOrbital &orbit1, const GaussianOrbital &orbit2, 
+							 const GaussianOrbital &orbit3, const BoysFunction &boyFn) const;
 	// Calculates the repulsion between gaussian orbitals. Only the hartree and fock terms 
 	// are considered
 
@@ -71,11 +72,13 @@ public:
 	double NuclearFunction(int l, int r, int i, int l1, int l2, double alpha, double beta,
 	                       double pos1, double pos2, double pos3) const;
 
+	double ElectronFunction(int l, int l_p, int r1, int r2, int i, int l1, int l2, int l3, int l4,
+							 double alpha1, double alpha2, double beta1, double beta2, 
+							 const Vector<double> &positions) const;
+
+	double ThetaFn(int l, int l1, int l2, double a, double b, double c, double d) const;
+
 	double GaussianProduct(int k, int l1, int l2, double pos1, double pos2) const;
-
-	double GaussianProduct2(int k, int l1, int l2, double pos1, double pos2);
-
-	double GaussianProduct3(int k, int l1, int l2, double pos1, double pos2);
 
 	GaussianOrbital ChangeK(int k) const;
 
