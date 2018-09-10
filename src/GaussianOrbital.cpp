@@ -231,14 +231,14 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 		int maxR = k / 2;
 		for (int r = 0; r <= maxR; r++)
 		{
-			int maxI = (k - 2 * r) / 2;
-			for (int i = 0; i <= maxI; i++)
+			for (int k_p = 0; k_p <= maxK_p; k_p++)
 			{
-				for (int k_p = 0; k_p <= maxK_p; k_p++)
+				int maxR_p = k_p / 2;
+				for (int r_p = 0; r_p <= maxR_p; r_p++)
 				{
-					int maxR_p = k_p / 2;
-					for (int r_p = 0; r_p <= maxR_p; r_p++)
-					{
+					int maxI = (k + k_p - 2 * (r + r_p)) / 2;
+					for (int i = 0; i <= maxI; i++)
+					{			
 						double Bx = ElectronFunction(k, k_p, r, r_p, i, m_k, orbit1.m_k, m_orbitPosition[0], orbit1.m_orbitPosition[0], positionP[0], gamma1, 
 													 orbit2.m_k, orbit3.m_k, orbit2.m_orbitPosition[0], orbit3.m_orbitPosition[0], positionQ[0], gamma2);
 						for (int m = 0; m <= maxM; m++)
@@ -246,13 +246,13 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 							int maxS = m / 2;
 							for (int s = 0; s <= maxS; s++)
 							{
-								int maxJ = (m - 2 * s) / 2;
-								for (int j = 0; j <= maxJ; j++)
+								for (int m_p = 0; m_p <= maxM_P; m_p++)
 								{
-									for (int m_p = 0; m_p <= maxM_P; m_p++)
+									int maxS_p = m_p / 2;
+									for (int s_p = 0; s_p <= maxS_p; s_p++)
 									{
-										int maxS_p = m_p / 2;
-										for (int s_p = 0; s_p <= maxS_p; s_p++)
+										int maxJ = (m + m_p - 2 * (s + s_p)) / 2;
+										for (int j = 0; j <= maxJ; j++)
 										{
 											double By = ElectronFunction(m, m_p, s, s_p, j, m_m, orbit1.m_m, m_orbitPosition[1], orbit1.m_orbitPosition[1], positionP[1], gamma1,
 													 					 orbit2.m_m, orbit3.m_m, orbit2.m_orbitPosition[1], orbit3.m_orbitPosition[1], positionQ[1], gamma2);
@@ -261,21 +261,18 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 												int maxT = n / 2;
 												for (int t = 0; t <= maxT; t++)
 												{
-													int maxL = (n - 2 * t) / 2;
-													for (int l = 0; l <= maxL; l++)
+													for (int n_p = 0; n_p <= maxN_p; n_p++)
 													{
-														for (int n_p = 0; n_p <= maxN_p; n_p++)
+														int maxT_p = n_p / 2;
+														for (int t_p = 0; t_p <= maxT_p; t_p++)
 														{
-															int maxT_p = n_p / 2;
-															for (int t_p = 0; t_p <= maxT_p; t_p++)
+															int maxL = (n + n_p - 2 * (t + t_p)) / 2;
+															for (int l = 0; l <= maxL; l++)
 															{
 																double Bz = ElectronFunction(n, n_p, t, t_p, l, m_n, orbit1.m_n, m_orbitPosition[2], orbit1.m_orbitPosition[2], positionP[2],
 																			gamma1, orbit2.m_n, orbit3.m_n, orbit2.m_orbitPosition[2], orbit3.m_orbitPosition[2], positionQ[2], gamma2);
 																int boysIndex = k + k_p + m + m_p + n + n_p - 2 * (r + r_p + s + s_p + t + t_p) - (i + j + l);
 																sum += Bx * By * Bz * boyFn.Interpolate(boysIndex, posQP2 / (4.0 * delta));
-														//		std::cout << "Bx " << Bx << std::endl;
-														//		std::cout << "BY " << By << std::endl;
-														//		std::cout << "Bz " << Bz << std::endl;
 															}
 														}
 													}
@@ -286,7 +283,6 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 								}
 							}
 						}
-						std::cout << "\n";
 					}
 				}
 			}
