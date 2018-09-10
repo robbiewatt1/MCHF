@@ -213,8 +213,6 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 				  + std::pow(positionP[1] - positionQ[1], 2.0)
 				  + std::pow(positionP[2] - positionQ[2], 2.0);
 
-	std::cout << posQP2 << " " << posCD2 << " " << posAB2 << std::endl;
-
 	double gaussProduct = 2.0 * std::pow(Constants::pi, 2.0) / (gamma1 * gamma2) * std::sqrt(Constants::pi / (gamma1 + gamma2))
 						* std::exp(-1.0 * (m_alpha * orbit1.m_alpha * posAB2 / gamma1) 
 								+ (-1.0 * (orbit2.m_alpha * orbit3.m_alpha * posCD2 / gamma2)));
@@ -288,7 +286,6 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 			}
 		}
 	}
-	std::cout << gaussProduct << " " << sum << std::endl;
 	return gaussProduct * sum;
 }
 

@@ -112,6 +112,35 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge,
 	return potentialEnergy;
 }
 
+double STOnGOrbit::ElectronRepulsion(const STOnGOrbit &orbit1, const STOnGOrbit &orbit2, 
+									 const STOnGOrbit &orbit3, const BoysFunction &boyFn) const
+{
+	double electRepulsiohn(0);
+	for (int i = 0; i < m_gaussianNumber; i++)
+	{
+		for (int j = 0; j < orbit1.m_gaussianNumber; j++)
+		{
+			for (int k = 0; k < orbit2.m_gaussianNumber; k++)
+			{
+				for (int l = 0; l < orbit3.m_gaussianNumber; l++)
+				{
+					electRepulsiohn += m_baseOrbitalVector[i].ElectronRepulsion(orbit1.GetBaseOribtal(j),
+											  orbit2.GetBaseOribtal(k), orbit3.GetBaseOribtal(l), boyFn)
+									   * m_coefficeints[i] * orbit1.m_coefficeints[j]
+									   * orbit2.m_coefficeints[k] * orbit2.m_coefficeints[l]
+									   * m_normaliseConstant * orbit1.m_normaliseConstant
+									   * orbit2.m_normaliseConstant * orbit3.m_normaliseConstant
+									   * m_baseOrbitalVector[i].GetNormaliseConstant()
+									   * orbit1.GetBaseOribtal(j).GetNormaliseConstant()
+									   * orbit2.GetBaseOribtal(k).GetNormaliseConstant()
+									   * orbit3.GetBaseOribtal(l).GetNormaliseConstant();
+				}
+			}
+		}
+	}
+	return electRepulsiohn;
+}
+
 Vector<double> STOnGOrbit::MatrixElement(const STOnGOrbit &orbit) const
 {
 	Vector<double> matrixElements(3);

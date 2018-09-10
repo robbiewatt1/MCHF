@@ -45,6 +45,10 @@ public:
 	// Cacultes the nuclear overlap intergral of the orbit with another orbital. the nuclearXYZ
 	// are the x y z position of the nuclus that the integral is being calculated around
 
+	double ElectronRepulsion(const STOnGOrbit &orbit1, const STOnGOrbit &orbit2, 
+							 const STOnGOrbit &orbit3, const BoysFunction &boyFn) const;
+
+
 	Vector<double> MatrixElement(const STOnGOrbit &orbit) const;
 	// Caculates the 3 components of the matrix element
 
