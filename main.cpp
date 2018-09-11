@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 //	std::cout << test.ElectronRepulsion(test, test2, test2, boyFn) << std::endl;
 //	std::cout << test2.ElectronRepulsion(test2, test2, test, boyFn) << std::endl;
 //	std::cout << test2.ElectronRepulsion(test, test2, test2, boyFn) << std::endl;
-	Molecule mol = Molecule(1.0, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
+	Molecule mol = Molecule(1, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
 	mol.CalculateEnergy();
 
 /*

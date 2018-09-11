@@ -45,5 +45,7 @@ private:
 	Matrix<double> m_oneElectronEnergy;
 	Matrix<double> m_exchangeEnergy;
 	Matrix<double> m_coulombEnergy;
+
+	Vector<double> m_energyLevels;
 };
 #endif

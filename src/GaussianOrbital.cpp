@@ -239,6 +239,10 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 					{			
 						double Bx = ElectronFunction(k, k_p, r, r_p, i, m_k, orbit1.m_k, m_orbitPosition[0], orbit1.m_orbitPosition[0], positionP[0], gamma1, 
 													 orbit2.m_k, orbit3.m_k, orbit2.m_orbitPosition[0], orbit3.m_orbitPosition[0], positionQ[0], gamma2);
+						if (Bx == 0)
+						{
+							break;
+						}
 						for (int m = 0; m <= maxM; m++)
 						{
 							int maxS = m / 2;
@@ -254,6 +258,10 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 										{
 											double By = ElectronFunction(m, m_p, s, s_p, j, m_m, orbit1.m_m, m_orbitPosition[1], orbit1.m_orbitPosition[1], positionP[1], gamma1,
 													 					 orbit2.m_m, orbit3.m_m, orbit2.m_orbitPosition[1], orbit3.m_orbitPosition[1], positionQ[1], gamma2);
+											if (By == 0)
+											{
+												break;
+											}
 											for (int n = 0; n <= maxN; n++)
 											{
 												int maxT = n / 2;
@@ -285,6 +293,10 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 				}
 			}
 		}
+	}
+	if (gaussProduct < 0.000001)
+	{
+		std::cout << std::setprecision (15) << gaussProduct * sum << std::endl;
 	}
 	return gaussProduct * sum;
 }
