@@ -221,5 +221,50 @@ class Matrix
 		return newMatrix;
 	}
 
+	friend Matrix<T> operator*(const T &scalar, const Matrix<T> &matrix)
+	{
+		Matrix<T> newMatrix = Matrix<T>(matrix.m_nRow,matrix.m_nColumn);
+
+		for(int i = 0; i < matrix.m_nRow; i++)
+		{
+			for(int j = 0; j < matrix.m_nColumn; j++)
+			{
+			newMatrix(i,j) = scalar * matrix[i][j];
+			}
+		}
+		return newMatrix;
+	}
+
+	friend Matrix<T> operator+(const Matrix<T> &matrix1, const Matrix<T> &matrix2)
+	{
+		assert(matrix1.m_nRow == matrix2.m_nRow);
+		assert(matrix1.m_nColumn == matrix2.m_nColumn);
+
+		Matrix<T> newMatrix = Matrix<T>(matrix1.m_nRow,matrix1.m_nColumn);
+		for(int i = 0; i < matrix1.m_nRow; i++)
+		{
+			for(int j = 0; j < matrix1.m_nColumn; j++)
+			{
+			newMatrix(i,j) = matrix1[i][j] + matrix2[i][j];
+			}
+		}
+		return newMatrix;
+	}
+
+		friend Matrix<T> operator-(const Matrix<T> &matrix1, const Matrix<T> &matrix2)
+	{
+		assert(matrix1.m_nRow == matrix2.m_nRow);
+		assert(matrix1.m_nColumn == matrix2.m_nColumn);
+
+		Matrix<T> newMatrix = Matrix<T>(matrix1.m_nRow,matrix1.m_nColumn);
+		for(int i = 0; i < matrix1.m_nRow; i++)
+		{
+			for(int j = 0; j < matrix1.m_nColumn; j++)
+			{
+			newMatrix(i,j) = matrix1[i][j] - matrix2[i][j];
+			}
+		}
+		return newMatrix;
+	}
 };
 #endif

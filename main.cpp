@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 4;
-	int maxU = std::pow(2,8);
+	int maxL = 2;
+	int maxU = std::pow(2,1);
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 16*maxU);
 	std::ofstream outfile("./OutputData/CarbonEnergy.dat");
 
@@ -53,11 +53,8 @@ int main(int argc, char* argv[])
 //	std::cout << test.ElectronRepulsion(test, test2, test2, boyFn) << std::endl;
 //	std::cout << test2.ElectronRepulsion(test2, test2, test, boyFn) << std::endl;
 //	std::cout << test2.ElectronRepulsion(test, test2, test2, boyFn) << std::endl;
-
-
-	STOnGOrbit test  = STOnGOrbit("./OrbitalData/STO6/1/S1", 0, 0, 0, positions[0]);
-	STOnGOrbit test2 = STOnGOrbit("./OrbitalData/STO6/1/S1", 0, 0, 0, positions[1]);
-	std::cout << test.ElectronRepulsion(test2, test2, test, boyFn) << std::endl;
+	Molecule mol = Molecule(1.0, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
+	mol.CalculateEnergy();
 
 /*
 	for(int i = 1000; i >= 1; i--)

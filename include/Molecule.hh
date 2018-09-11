@@ -8,15 +8,15 @@
 #include "STOnGOrbit.hh"
 #include "BoysFunction.hh"
 
-
 class Molecule
 {
 public:
 
 	Molecule();
 
-	Molecule(const Vector<double> &nuclearCharges, const Vector<Vector<double>> &nuclearPositions,
-	         int maxL, const BoysFunction &boyFn, std::string basisSetDir);
+	Molecule(int nElectrons, const Vector<double> &nuclearCharges, 
+			 const Vector<Vector<double>> &nuclearPositions, int maxL,
+			 const BoysFunction &boyFn, std::string basisSetDir);
 
 	~Molecule();
 
@@ -57,6 +57,7 @@ private:
 	Vector<double> m_nuclearCharges;			// Vector containing the charge of each ion
 	Vector<Vector<double>> m_nuclearPositions;	// Vector containing the position of each ion
 	int m_maxL;									// The maximum angular momentum of each basis set
+	int m_nElectrons;							// Number of electrons in molecule
 
 	Vector<STOnGOrbit> m_basisSet;				// Vector of the basis set functions
 	Vector<double> m_energyLevels;				// Vector of the energy levels

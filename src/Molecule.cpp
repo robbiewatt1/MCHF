@@ -8,15 +8,17 @@
 #include "LinearAlgebra.hh"
 #include "STOnGOrbit.hh"
 #include "Numerics.hh"
+#include "FockSolver.hh"
 
 Molecule::Molecule()
 {
 }
 
-Molecule::Molecule(const Vector<double> &nuclearCharges,
-                   const Vector<Vector<double>> &nuclearPositions, int maxL,
-                   const BoysFunction &boyFn, std::string basisSetDir):
-	m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL)
+Molecule::Molecule(int nElectrons, const Vector<double> &nuclearCharges,
+				   const Vector<Vector<double>> &nuclearPositions, int maxL,
+				   const BoysFunction &boyFn, std::string basisSetDir):
+m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL),
+m_nElectrons(nElectrons)
 {
 	SetBasisSet(basisSetDir);
 	m_boyFn = boyFn;
@@ -38,6 +40,11 @@ Matrix<double> Molecule::GetBasisCoefficients()
 
 void Molecule::CalculateEnergy()
 {
+
+	FockSolver solver = FockSolver(m_nuclearCharges, m_nuclearPositions, m_basisSet,
+								   m_nElectrons, m_boyFn);
+	solver.Solve();
+	/*
 	Matrix<double> energyMaxtrix(m_basisSet.Length(), m_basisSet.Length());
 	Matrix<double> overlapMatrix(m_basisSet.Length(), m_basisSet.Length());
 
@@ -107,6 +114,8 @@ void Molecule::CalculateEnergy()
 	Matrix<double> reducedEnergy = LinearAlgebra::Transpose(reducedOVec) * energyMaxtrix * (reducedOVec);
 	LinearAlgebra::EigenSolver(reducedEnergy,m_basisSetCoefficients, m_energyLevels);
 	m_basisSetCoefficients = reducedOVec * m_basisSetCoefficients;
+
+*/
 }
 
 Vector<double> Molecule::MatrixElement(int level1, int level2)
