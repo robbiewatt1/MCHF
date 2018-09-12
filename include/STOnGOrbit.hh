@@ -14,7 +14,7 @@ public:
 
 	STOnGOrbit();
 
-	STOnGOrbit(std::string dataFile, int k, int m, int n, Vector<double> orbitPosition);
+	STOnGOrbit(std::string dataFile, int k, int m, int n, int spin, Vector<double> orbitPosition);
 
 	~STOnGOrbit();
 
@@ -77,6 +77,7 @@ private:
 	unsigned int m_k;			// x quntum number of angular momentum
 	unsigned int m_m;			// y quntum number of angular momentum
 	unsigned int m_n;			// z quntum number of angular momentum
+	unsigned int m_spin;
 	Vector<double> m_orbitPosition;	// x position of centre of gaussian
 
 	double m_normaliseConstant;	// Factor to normilise the wavefunction

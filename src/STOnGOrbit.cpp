@@ -11,8 +11,9 @@ STOnGOrbit::STOnGOrbit():
 {
 }
 
-STOnGOrbit::STOnGOrbit(std::string dataFile, int k, int m, int n, Vector<double> orbitPosition):
-	m_k(k), m_m(m), m_n(n)
+STOnGOrbit::STOnGOrbit(std::string dataFile, int k, int m, int n, int spin, 
+					   Vector<double> orbitPosition):
+	m_k(k), m_m(m), m_n(n), m_spin(spin)
 {
 	m_orbitPosition = orbitPosition;
 	OpenDataFile(dataFile);
@@ -62,15 +63,18 @@ double STOnGOrbit::GetCoefficient(int i) const
 double STOnGOrbit::Overlap(const STOnGOrbit &orbit) const
 {
 	double overlap(0);
-	for (int i = 0; i < m_gaussianNumber; i++)
+	if (m_spin == orbit.m_spin)
 	{
-		for (int j = 0; j < orbit.m_gaussianNumber; j++)
+		for (int i = 0; i < m_gaussianNumber; i++)
 		{
-			overlap += m_baseOrbitalVector[i].Overlap(orbit.GetBaseOribtal(j)) 
-						* m_coefficeints[i] * orbit.m_coefficeints[j]
-						* m_normaliseConstant * orbit.m_normaliseConstant
-						* m_baseOrbitalVector[i].GetNormaliseConstant()
-						* orbit.GetBaseOribtal(j).GetNormaliseConstant();
+			for (int j = 0; j < orbit.m_gaussianNumber; j++)
+			{
+				overlap += m_baseOrbitalVector[i].Overlap(orbit.GetBaseOribtal(j)) 
+							* m_coefficeints[i] * orbit.m_coefficeints[j]
+							* m_normaliseConstant * orbit.m_normaliseConstant
+							* m_baseOrbitalVector[i].GetNormaliseConstant()
+							* orbit.GetBaseOribtal(j).GetNormaliseConstant();
+			}
 		}
 	}
 	return overlap;
@@ -79,15 +83,18 @@ double STOnGOrbit::Overlap(const STOnGOrbit &orbit) const
 double STOnGOrbit::KineticOverlap(const STOnGOrbit &orbit) const
 {
 	double knieticEnergy(0);
-	for (int i = 0; i < m_gaussianNumber; i++)
+	if (m_spin == orbit.m_spin)
 	{
-		for (int j = 0; j < orbit.m_gaussianNumber; j++)
+		for (int i = 0; i < m_gaussianNumber; i++)
 		{
-			knieticEnergy += m_baseOrbitalVector[i].KineticOverlap(orbit.GetBaseOribtal(j)) 
-							 * m_coefficeints[i] * orbit.m_coefficeints[j]
-							 * m_normaliseConstant * orbit.m_normaliseConstant
-							 * m_baseOrbitalVector[i].GetNormaliseConstant()
-							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+			for (int j = 0; j < orbit.m_gaussianNumber; j++)
+			{
+				knieticEnergy += m_baseOrbitalVector[i].KineticOverlap(orbit.GetBaseOribtal(j)) 
+								 * m_coefficeints[i] * orbit.m_coefficeints[j]
+								 * m_normaliseConstant * orbit.m_normaliseConstant
+								 * m_baseOrbitalVector[i].GetNormaliseConstant()
+								 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+			}
 		}
 	}
 	return knieticEnergy;
@@ -97,16 +104,19 @@ double STOnGOrbit::NuclearOverlap(const STOnGOrbit &orbit, int nuclearCharge,
 								  const Vector<double> &nuclearPosition, const BoysFunction &boyFn) const
 {
 	double potentialEnergy(0);
-	for (int i = 0; i < m_gaussianNumber; i++)
+	if (m_spin == orbit.m_spin)
 	{
-		for (int j = 0; j < orbit.m_gaussianNumber; j++)
+		for (int i = 0; i < m_gaussianNumber; i++)
 		{
-			potentialEnergy += m_baseOrbitalVector[i].NuclearOverlap(orbit.GetBaseOribtal(j), 
-									nuclearCharge, nuclearPosition, boyFn)
-							 * m_coefficeints[i] * orbit.m_coefficeints[j]
-							 * m_normaliseConstant * orbit.m_normaliseConstant
-							 * m_baseOrbitalVector[i].GetNormaliseConstant()
-							 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+			for (int j = 0; j < orbit.m_gaussianNumber; j++)
+			{
+				potentialEnergy += m_baseOrbitalVector[i].NuclearOverlap(orbit.GetBaseOribtal(j), 
+										nuclearCharge, nuclearPosition, boyFn)
+								 * m_coefficeints[i] * orbit.m_coefficeints[j]
+								 * m_normaliseConstant * orbit.m_normaliseConstant
+								 * m_baseOrbitalVector[i].GetNormaliseConstant()
+								 * orbit.GetBaseOribtal(j).GetNormaliseConstant();
+			}
 		}
 	}
 	return potentialEnergy;
@@ -116,24 +126,27 @@ double STOnGOrbit::ElectronRepulsion(const STOnGOrbit &orbit1, const STOnGOrbit 
 									 const STOnGOrbit &orbit3, const BoysFunction &boyFn) const
 {
 	double electRepulsiohn(0);
-	for (int i = 0; i < m_gaussianNumber; i++)
+	if(m_spin == orbit1.m_spin && orbit2.m_spin == orbit3.m_spin)
 	{
-		for (int j = 0; j < orbit1.m_gaussianNumber; j++)
+		for (int i = 0; i < m_gaussianNumber; i++)
 		{
-			for (int k = 0; k < orbit2.m_gaussianNumber; k++)
+			for (int j = 0; j < orbit1.m_gaussianNumber; j++)
 			{
-				for (int l = 0; l < orbit3.m_gaussianNumber; l++)
+				for (int k = 0; k < orbit2.m_gaussianNumber; k++)
 				{
-					electRepulsiohn += m_baseOrbitalVector[i].ElectronRepulsion(orbit1.GetBaseOribtal(j),
-											  orbit2.GetBaseOribtal(k), orbit3.GetBaseOribtal(l), boyFn)
-									   * m_coefficeints[i] * orbit1.m_coefficeints[j]
-									   * orbit2.m_coefficeints[k] * orbit2.m_coefficeints[l]
-									   * m_normaliseConstant * orbit1.m_normaliseConstant
-									   * orbit2.m_normaliseConstant * orbit3.m_normaliseConstant
-									   * m_baseOrbitalVector[i].GetNormaliseConstant()
-									   * orbit1.GetBaseOribtal(j).GetNormaliseConstant()
-									   * orbit2.GetBaseOribtal(k).GetNormaliseConstant()
-									   * orbit3.GetBaseOribtal(l).GetNormaliseConstant();
+					for (int l = 0; l < orbit3.m_gaussianNumber; l++)
+					{
+						electRepulsiohn += m_baseOrbitalVector[i].ElectronRepulsion(orbit1.GetBaseOribtal(j),
+												  orbit2.GetBaseOribtal(k), orbit3.GetBaseOribtal(l), boyFn)
+										   * m_coefficeints[i] * orbit1.m_coefficeints[j]
+										   * orbit2.m_coefficeints[k] * orbit2.m_coefficeints[l]
+										   * m_normaliseConstant * orbit1.m_normaliseConstant
+										   * orbit2.m_normaliseConstant * orbit3.m_normaliseConstant
+										   * m_baseOrbitalVector[i].GetNormaliseConstant()
+										   * orbit1.GetBaseOribtal(j).GetNormaliseConstant()
+										   * orbit2.GetBaseOribtal(k).GetNormaliseConstant()
+										   * orbit3.GetBaseOribtal(l).GetNormaliseConstant();
+					}
 				}
 			}
 		}

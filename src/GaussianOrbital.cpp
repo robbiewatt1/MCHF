@@ -241,7 +241,7 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 													 orbit2.m_k, orbit3.m_k, orbit2.m_orbitPosition[0], orbit3.m_orbitPosition[0], positionQ[0], gamma2);
 						if (Bx == 0)
 						{
-							break;
+							continue;
 						}
 						for (int m = 0; m <= maxM; m++)
 						{
@@ -260,7 +260,7 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 													 					 orbit2.m_m, orbit3.m_m, orbit2.m_orbitPosition[1], orbit3.m_orbitPosition[1], positionQ[1], gamma2);
 											if (By == 0)
 											{
-												break;
+												continue;
 											}
 											for (int n = 0; n <= maxN; n++)
 											{
@@ -277,6 +277,10 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 															{
 																double Bz = ElectronFunction(n, n_p, t, t_p, l, m_n, orbit1.m_n, m_orbitPosition[2], orbit1.m_orbitPosition[2], positionP[2],
 																			gamma1, orbit2.m_n, orbit3.m_n, orbit2.m_orbitPosition[2], orbit3.m_orbitPosition[2], positionQ[2], gamma2);
+																if (Bz == 0)
+																{
+																	continue;
+																}
 																int boysIndex = k + k_p + m + m_p + n + n_p - 2 * (r + r_p + s + s_p + t + t_p) - (i + j + l);
 																sum += Bx * By * Bz * boyFn.Interpolate(boysIndex, posQP2 / (4.0 * delta));
 															}
@@ -293,10 +297,6 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 				}
 			}
 		}
-	}
-	if (gaussProduct < 0.000001)
-	{
-		std::cout << std::setprecision (15) << gaussProduct * sum << std::endl;
 	}
 	return gaussProduct * sum;
 }

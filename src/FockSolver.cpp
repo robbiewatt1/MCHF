@@ -26,17 +26,18 @@ void FockSolver::Solve()
 	InitialGuess(m_coeffC);
 	m_coeffC.Print();
 
-	// Solve the system
+	// Solve for the one electron matrix. This only needs to be done once
 	OneElectronSolver();
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 50; i++)
 	{
+		
 
 		CoulombSolver();
 		ExchangeSolver();
 		// Form the fock matrix
-		Matrix<double> fockMaxtrix = m_oneElectronEnergy + 2.0 * m_coulombEnergy - m_exchangeEnergy;
-
+		Matrix<double> fockMaxtrix = m_oneElectronEnergy;// + m_coulombEnergy - m_exchangeEnergy;
+		(fockMaxtrix).Print();
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
 		Vector<double> othgTransVector;
 		Matrix<double> othgTransMatrix;
@@ -50,12 +51,25 @@ void FockSolver::Solve()
 		}
 		// Transform to the othogonal coods
 		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
-		m_coeffC    = LinearAlgebra::Inverse(othgTransMatrix) * m_coeffC;
+		Matrix<double> orbitalCoeff =  m_coeffC;
 
 		// Solve the eigenvalue HF equation
-		LinearAlgebra::EigenSolver(fockMaxtrix, m_coeffC, m_energyLevels);
+		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeff, m_energyLevels);
+
+		// Reduce the matrix back to correct size
+		orbitalCoeff = othgTransMatrix * orbitalCoeff;
+		orbitalCoeff.Print();
+
+		for (int j = 0; j < m_nElectrons; j++)
+		{
+			for (int k = 0; k < m_basisSet.Length(); k++)
+			{
+				m_coeffC[k][j] = orbitalCoeff[k][j];			
+			}
+		}
+		m_coeffC.Print();
 		m_energyLevels.Print();
-		(othgTransMatrix * m_coeffC).Print();
+		std::cout << "\n\n\n\n";
 	}
 
 }

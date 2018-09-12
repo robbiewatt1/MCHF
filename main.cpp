@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 2;
+	int maxL = 1;
 	int maxU = std::pow(2,1);
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 16*maxU);
 	std::ofstream outfile("./OutputData/CarbonEnergy.dat");

@@ -266,23 +266,25 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 				fileNames.Append(file->path().string());
 			}
 		}
-		// Loop over k, m and n such that the sum is less than the maximum L
-		for (int n = 0; n <= m_maxL; n++)
+		for (int s = 0; s < 1; s++) // Loop over both spin
 		{
-			for (int m = 0; m <= m_maxL; m++)
+			// Loop over k, m and n such that the sum is less than the maximum L
+			for (int n = 0; n <= m_maxL; n++)
 			{
-				for (int k = 0; k <= m_maxL; k++)
+				for (int m = 0; m <= m_maxL; m++)
 				{
-					if (n + m + k <= m_maxL)
+					for (int k = 0; k <= m_maxL; k++)
 					{
-						// Now loop through basis sets
-						for (int j = 0; j < fileNames.Length(); ++j)
+						if (n + m + k <= m_maxL)
 						{
-							STOnGOrbit orbital = STOnGOrbit(fileNames[j], k, m, n,
-										     m_nuclearPositions[i]);
-							m_basisSet.Append(orbital);
+							// Now loop through basis sets
+							for (int j = 0; j < fileNames.Length(); ++j)
+							{
+								STOnGOrbit orbital = STOnGOrbit(fileNames[j], k, m, n, s,
+											     m_nuclearPositions[i]);
+								m_basisSet.Append(orbital);
+							}
 						}
-
 					}
 				}
 			}
