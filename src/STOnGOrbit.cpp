@@ -139,7 +139,7 @@ double STOnGOrbit::ElectronRepulsion(const STOnGOrbit &orbit1, const STOnGOrbit 
 						electRepulsiohn += m_baseOrbitalVector[i].ElectronRepulsion(orbit1.GetBaseOribtal(j),
 												  orbit2.GetBaseOribtal(k), orbit3.GetBaseOribtal(l), boyFn)
 										   * m_coefficeints[i] * orbit1.m_coefficeints[j]
-										   * orbit2.m_coefficeints[k] * orbit2.m_coefficeints[l]
+										   * orbit2.m_coefficeints[k] * orbit3.m_coefficeints[l]
 										   * m_normaliseConstant * orbit1.m_normaliseConstant
 										   * orbit2.m_normaliseConstant * orbit3.m_normaliseConstant
 										   * m_baseOrbitalVector[i].GetNormaliseConstant()

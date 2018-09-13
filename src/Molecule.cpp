@@ -266,7 +266,7 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 				fileNames.Append(file->path().string());
 			}
 		}
-		for (int s = 0; s < 1; s++) // Loop over both spin
+		for (int s = 0; s <= 1; s++) // Loop over both spin
 		{
 			// Loop over k, m and n such that the sum is less than the maximum L
 			for (int n = 0; n <= m_maxL; n++)

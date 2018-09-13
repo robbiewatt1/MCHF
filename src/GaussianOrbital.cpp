@@ -216,7 +216,10 @@ double GaussianOrbital::ElectronRepulsion(const GaussianOrbital &orbit1, const G
 	double gaussProduct = 2.0 * std::pow(Constants::pi, 2.0) / (gamma1 * gamma2) * std::sqrt(Constants::pi / (gamma1 + gamma2))
 						* std::exp(-1.0 * (m_alpha * orbit1.m_alpha * posAB2 / gamma1) 
 								+ (-1.0 * (orbit2.m_alpha * orbit3.m_alpha * posCD2 / gamma2)));
-
+	if (gaussProduct < 1e-10)
+	{
+		return 0;
+	}
 	double sum(0);
 	int maxK   = m_k + orbit1.m_k;
 	int maxK_p = orbit2.m_k + orbit3.m_k;

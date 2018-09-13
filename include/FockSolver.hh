@@ -25,13 +25,12 @@ private:
 
 	void OneElectronSolver();
 
-	void CoulombSolver();
+	void TwoElectronSolver();
 
-	void ExchangeSolver();
 
 	double IonPotential(int z1, int z2, Vector<double> ionLocation1, Vector<double> ionLocation2);
 
-	void InitialGuess(Matrix<double> &coeffC);
+	void InitialGuess();
 
 private:
 	int m_nElectrons;
