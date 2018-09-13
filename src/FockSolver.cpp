@@ -24,7 +24,6 @@ void FockSolver::Solve()
 	// with everything 1
 	m_coeffC = Matrix<double>(m_basisSet.Length(), m_nElectrons);
 	InitialGuess(m_coeffC);
-	m_coeffC.Print();
 
 	// Solve for the one electron matrix. This only needs to be done once
 	OneElectronSolver();
@@ -35,13 +34,17 @@ void FockSolver::Solve()
 
 		CoulombSolver();
 		ExchangeSolver();
-		// Form the fock matrix
+
+
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy;// + m_coulombEnergy - m_exchangeEnergy;
-		(fockMaxtrix).Print();
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
+		(LinearAlgebra::Transpose(m_coeffC) * m_exchangeEnergy * m_coeffC).Print();
+		(LinearAlgebra::Transpose(m_coeffC) * m_coulombEnergy * m_coeffC).Print();
+		getchar();
 		Vector<double> othgTransVector;
 		Matrix<double> othgTransMatrix;
 		LinearAlgebra::EigenSolver(m_basisOverlap, othgTransMatrix, othgTransVector);
+		fockMaxtrix.Print();
 		for (int j = 0; j < m_basisOverlap.GetRows(); j++)
 		{
 			for (int k = 0; k < m_basisOverlap.GetColumns(); k++)
@@ -49,16 +52,18 @@ void FockSolver::Solve()
 				othgTransMatrix[j][k] /=  std::sqrt(othgTransVector[k]);
 			}
 		}
+
 		// Transform to the othogonal coods
 		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
-		Matrix<double> orbitalCoeff =  m_coeffC;
+		
 
 		// Solve the eigenvalue HF equation
+		Matrix<double> orbitalCoeff;
 		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeff, m_energyLevels);
 
 		// Reduce the matrix back to correct size
 		orbitalCoeff = othgTransMatrix * orbitalCoeff;
-		orbitalCoeff.Print();
+	//	orbitalCoeff.Print();
 
 		for (int j = 0; j < m_nElectrons; j++)
 		{
@@ -67,7 +72,7 @@ void FockSolver::Solve()
 				m_coeffC[k][j] = orbitalCoeff[k][j];			
 			}
 		}
-		m_coeffC.Print();
+	//	m_coeffC.Print();
 		m_energyLevels.Print();
 		std::cout << "\n\n\n\n";
 	}
@@ -121,16 +126,16 @@ void FockSolver::CoulombSolver()
 	#pragma omp parallel for
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
-		for (int j = i; j < m_basisSet.Length(); j++)
+		for (int j = 0; j < m_basisSet.Length(); j++)
 		{
 			double coulombEnergy(0);
 			for (int k = 0; k < m_basisSet.Length(); k++)
 			{
-				for (int l = 0; l < m_basisSet.Length(); +l++)
+				for (int l = 0; l < m_basisSet.Length(); l++)
 				{
 					if (weights[k][l] == 0)
 					{
-						break;
+						continue;
 					}else
 					{
 						coulombEnergy += weights[k][l] * m_basisSet[i].ElectronRepulsion(m_basisSet[j],
@@ -139,7 +144,7 @@ void FockSolver::CoulombSolver()
 				}
 			}
 			m_coulombEnergy[i][j] = coulombEnergy;
-			m_coulombEnergy[j][i] = coulombEnergy;
+		//	m_coulombEnergy[j][i] = coulombEnergy;
 			// Think this should be symetirc but will need to check
 		}
 	}
@@ -160,20 +165,20 @@ void FockSolver::ExchangeSolver()
 			double exchangeEnergy(0);
 			for (int k = 0; k < m_basisSet.Length(); k++)
 			{
-				for (int l = 0; l < m_basisSet.Length(); +l++)
+				for (int l = 0; l < m_basisSet.Length(); l++)
 				{
 					if (weights[k][l] == 0)
 					{
-						break;
+						continue;
 					} else
 					{
-						exchangeEnergy += weights[k][l] * m_basisSet[i].ElectronRepulsion(m_basisSet[l],
-					    	              m_basisSet[k], m_basisSet[j], m_boyFn);
+						exchangeEnergy += weights[l][k] * m_basisSet[i].ElectronRepulsion(m_basisSet[k],
+					    	              m_basisSet[j], m_basisSet[l], m_boyFn);
 					}
 				}
 			}
 			m_exchangeEnergy[i][j] = exchangeEnergy;
-			m_exchangeEnergy[j][i] = exchangeEnergy;
+	//		m_exchangeEnergy[j][i] = exchangeEnergy;
 			// Think this should be symetirc but will need to check
 		}
 	}

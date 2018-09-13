@@ -41,18 +41,14 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 1;
+	int maxL = 3;
 	int maxU = std::pow(2,1);
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 16*maxU);
 	std::ofstream outfile("./OutputData/CarbonEnergy.dat");
 
-//	GaussianOrbital test = GaussianOrbital(0, 0, 0, 1.0 , positions[0]);
-//	GaussianOrbital test2 = GaussianOrbital(0, 0, 1, 1.0 , positions[0]);
+//	GaussianOrbital test = GaussianOrbital(2, 2, 2, 0.5 , positions[0]);
+//	GaussianOrbital test2 = GaussianOrbital(4, 4, 4, 0.5 , positions[0]);
 
-//	std::cout << test2.ElectronRepulsion(test2, test, test, boyFn) << std::endl;
-//	std::cout << test.ElectronRepulsion(test, test2, test2, boyFn) << std::endl;
-//	std::cout << test2.ElectronRepulsion(test2, test2, test, boyFn) << std::endl;
-//	std::cout << test2.ElectronRepulsion(test, test2, test2, boyFn) << std::endl;
 	Molecule mol = Molecule(1, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
 	mol.CalculateEnergy();
 
