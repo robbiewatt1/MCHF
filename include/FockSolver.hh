@@ -27,6 +27,7 @@ private:
 
 	void TwoElectronSolver();
 
+	void ElectronRepulsionSolver();
 
 	double IonPotential(int z1, int z2, Vector<double> ionLocation1, Vector<double> ionLocation2);
 
@@ -38,6 +39,8 @@ private:
 	Vector<Vector<double>> m_nuclearPositions;
 	Vector<double> m_nuclearCharges;
 	BoysFunction m_boyFn;
+	Matrix<Matrix<double>> m_eRepulsion;
+
 
 	Matrix<double> m_coeffC;
 	Matrix<double> m_basisOverlap;
@@ -46,5 +49,6 @@ private:
 	Matrix<double> m_coulombEnergy;
 
 	Vector<double> m_energyLevels;
+
 };
 #endif

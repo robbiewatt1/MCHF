@@ -39,10 +39,10 @@ class Matrix
 					{
 						if(i == j)
 						{
-							m_data[i][j] = 1.0;
+//							m_data[i][j] = 1.0;
 						}else
 						{
-							m_data[i][j] = 0.0;
+//							m_data[i][j] = 0.0;
 						}
 					}
 				}
@@ -53,7 +53,7 @@ class Matrix
 				{
 					for(int j = 0; j < m_nColumn; j++)
 					{
-						m_data[i][j] = 0;
+	//					m_data[i][j] = 0;
 					}
 				}
 			}
