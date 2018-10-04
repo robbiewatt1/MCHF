@@ -82,6 +82,16 @@ Vector<double> LinearAlgebra::TruncateUpper(const Vector<double> &vector, int in
 	return truncated;
 }
 
+double LinearAlgebra::Trace(const Matrix<double> &matrix)
+{
+	double trace(0);
+	for (int i = 0; i < matrix.GetRows(); i++)
+	{
+		trace += matrix[i][i];
+	}
+	return trace;
+}
+
 Matrix<double> LinearAlgebra::Transpose(const Matrix<double> &matrix)
 {
 	Matrix<double> transpose(matrix.GetColumns(), matrix.GetRows());

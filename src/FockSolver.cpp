@@ -22,50 +22,67 @@ void FockSolver::Solve()
 {
 	// First we need to set the m_coeff matrix. Not sure of the best initail guess so will start
 	// with everything 1
-	
 	InitialGuess();
-	m_coeffC.Print();
 
 	// Solve for the one electron matrix. This only needs to be done once
 	OneElectronSolver();
 	ElectronRepulsionSolver();
-
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		TwoElectronSolver();
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy + 2.0 * m_coulombEnergy - m_exchangeEnergy;
+		//(2.0 * m_coulombEnergy - m_exchangeEnergy).Print();
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
 		Vector<double> othgTransVector;
 		Matrix<double> othgTransMatrix;
 		LinearAlgebra::EigenSolver(m_basisOverlap, othgTransMatrix, othgTransVector);
-
+		Matrix<double> eigenMatrix(m_basisOverlap.GetRows(), m_basisOverlap.GetColumns());
 		for (int j = 0; j < m_basisOverlap.GetRows(); j++)
 		{
 			for (int k = 0; k < m_basisOverlap.GetColumns(); k++)
 			{
-				othgTransMatrix[j][k] /=  std::sqrt(othgTransVector[k]);
+				if (k == j)
+				{
+					eigenMatrix[k][k] = 1.0 / std::sqrt(othgTransVector[k]);
+				} else
+				{
+					eigenMatrix[j][k] = 0;
+				}
 			}
 		}
-		// Transform to the othogonal coods
+		othgTransMatrix = othgTransMatrix * eigenMatrix * LinearAlgebra::Transpose(othgTransMatrix);
 		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
-		
-
-		// Solve the eigenvalue HF equation
+		fockMaxtrix.Print();
 		Matrix<double> orbitalCoeff;
 		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeff, m_energyLevels);
-
-		// Reduce the matrix back to correct size
 		orbitalCoeff = othgTransMatrix * orbitalCoeff;
-
+		// only occupided oribtals
 		for (int j = 0; j < m_basisSet.Length(); j++)
 		{
-			for (int k = 0; k <  m_nElectrons; k++)
+			for (int k = 0; k <  m_basisSet.Length(); k++)
 			{
-				m_coeffC[j][k] = orbitalCoeff[j][k];			
+				double sum(0);
+				for (int l = 0; l < m_nElectrons; l++)
+				{
+					sum += orbitalCoeff[j][l] * orbitalCoeff[k][l];
+				}
+				m_density[j][k] = sum;
 			}
 		}
-		m_coeffC.Print();
+		m_density.Print();
+		double sum(0);
+		for (int j = 0; j < m_basisSet.Length(); ++j)
+		{
+			for (int k = 0; k < m_basisSet.Length(); ++k)
+			{
+				sum += m_density[j][k] * (2.0 * m_oneElectronEnergy[j][k] + 2.0 * m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]);
+			}
+		}
+		std::cout << sum << std::endl;
 		m_energyLevels.Print();
+	//	m_density.Print();
+	//	std::cout << LinearAlgebra::Trace(fockMaxtrix * m_density) << std::endl;
+	//	m_energyLevels.Print();
 	}
 
 }
@@ -77,15 +94,15 @@ void FockSolver::OneElectronSolver()
 
 	// calculate the ion repulsion potenital
 	double ionPotential(0);
-	#pragma omp parallel for
-	for (int i = 0; i < m_nuclearCharges.Length(); i++)
-	{
-		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
-		{
-			ionPotential += IonPotential(m_nuclearCharges[i], m_nuclearCharges[j],
-			                             m_nuclearPositions[i], m_nuclearPositions[j]);
-		}
-	}
+//	#pragma omp parallel for
+//	for (int i = 0; i < m_nuclearCharges.Length(); i++)
+//	{
+//		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
+//		{
+//			ionPotential += IonPotential(m_nuclearCharges[i], m_nuclearCharges[j],
+//			                             m_nuclearPositions[i], m_nuclearPositions[j]);
+//		}
+//	}
 	#pragma omp parallel for
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
@@ -111,10 +128,6 @@ void FockSolver::TwoElectronSolver()
 {
 	m_coulombEnergy = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 	m_exchangeEnergy = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
-	Matrix<double> weights(m_basisSet.Length(), m_basisSet.Length());
-	// Check this is in the right order
-	weights = m_coeffC * LinearAlgebra::Transpose(m_coeffC);
-	weights.Print();
 	#pragma omp parallel for	
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
@@ -126,8 +139,8 @@ void FockSolver::TwoElectronSolver()
 			{
 				for (int l = 0; l < m_basisSet.Length(); l++)
 				{
-					exchangeEnergy += weights[k][l] * m_eRepulsion[i][k][j][l];
-					coulombEnergy  += weights[k][l] * m_eRepulsion[i][k][j][l];
+					exchangeEnergy += m_density[k][l] * m_eRepulsion[i][k][j][l];
+					coulombEnergy  += m_density[k][l] * m_eRepulsion[i][j][k][l];
 				}
 			}
 			m_exchangeEnergy[i][j] = exchangeEnergy;
@@ -166,8 +179,8 @@ void FockSolver::ElectronRepulsionSolver()
 				}
 				for (int l = 0; l <= lMax; l++)
 				{
-					m_eRepulsion[i][j][k][l] = m_basisSet[i].ElectronRepulsion(m_basisSet[l],
-										  			  m_basisSet[k], m_basisSet[j], m_boyFn);
+					m_eRepulsion[i][j][k][l] = m_basisSet[i].ElectronRepulsion(m_basisSet[j],
+										  			  m_basisSet[k], m_basisSet[l], m_boyFn);
 					m_eRepulsion[i][j][l][k] = m_eRepulsion[i][j][k][l];
 					m_eRepulsion[j][i][k][l] = m_eRepulsion[i][j][k][l];
 					m_eRepulsion[j][i][l][k] = m_eRepulsion[i][j][k][l];
@@ -175,6 +188,19 @@ void FockSolver::ElectronRepulsionSolver()
 					m_eRepulsion[k][l][j][i] = m_eRepulsion[i][j][k][l];
 					m_eRepulsion[l][k][i][j] = m_eRepulsion[i][j][k][l];
 					m_eRepulsion[l][k][j][i] = m_eRepulsion[i][j][k][l];			
+				}
+			}
+		}
+	}
+	for (int i = 0; i < m_basisSet.Length(); i++)
+	{
+		for (int j = 0; j <= i; j++)
+		{
+			for (int k = 0; k <= j; k++)
+			{
+				for (int l = 0; l <= k; l++)
+				{
+					std::cout << i+1 << " " << j+1 << " " << k+1 << " " << l+1 << " " << m_eRepulsion[i][j][k][l] << std::endl;
 				}
 			}
 		}
@@ -192,22 +218,22 @@ double FockSolver::IonPotential(int z1, int z2, Vector<double> ionLocation1,
 
 void FockSolver::InitialGuess()
 {
-	m_coeffC = Matrix<double>(m_basisSet.Length(), m_nElectrons);
+	m_density = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 
 	// This should be part of the matrix class
 	for (int i = 0; i < m_basisSet.Length(); ++i)
 	{
-		for (int j = 0; j < m_nElectrons; ++j)
+		for (int j = 0; j < m_basisSet.Length(); ++j)
 		{
-			m_coeffC[i][j] = 1.0;
+			m_density[i][j] = 0.0;
 		}
 	}
 
 	for (int i = 0; i < 1; ++i)
 	{
-		for (int j = 0; j < m_nElectrons; ++j)
+		for (int j = 0; j < m_basisSet.Length(); ++j)
 		{
-			m_coeffC[i+(j*m_basisSet.Length() / m_nElectrons)][j] = 1.0;
+			m_density[i+(j*m_basisSet.Length() / m_basisSet.Length())][j] = 0.0;
 		}
 	}
 }

@@ -42,12 +42,13 @@ int main(int argc, char* argv[])
 	}
 
 	int maxL = 1;
-	int maxU = std::pow(2,2);
-	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 8*maxU);
+	int maxU = std::pow(2,12);
+	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 2*2*2*2*2*32*maxU);
 	std::ofstream outfile("./OutputData/CarbonEnergy.dat");
 
-	Molecule mol = Molecule(2, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
+	Molecule mol = Molecule(5, charges, positions, maxL, boyFn, "./OrbitalData/STO3/");
 	mol.CalculateEnergy();
+
 
 /*
 	for(int i = 1000; i >= 1; i--)

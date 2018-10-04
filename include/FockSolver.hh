@@ -42,7 +42,7 @@ private:
 	Matrix<Matrix<double>> m_eRepulsion;
 
 
-	Matrix<double> m_coeffC;
+	Matrix<double> m_density;
 	Matrix<double> m_basisOverlap;
 	Matrix<double> m_oneElectronEnergy;
 	Matrix<double> m_exchangeEnergy;

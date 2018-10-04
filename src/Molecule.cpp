@@ -248,6 +248,7 @@ void Molecule::OutputData(int level, std::string fileName)
 
 void Molecule::SetBasisSet(std::string basisSetDir)
 {
+/*
 	// Loop over all ions involved
 	for (int i = 0; i < m_nuclearPositions.Length(); i++)
 	{
@@ -290,6 +291,24 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 			}
 		}
 	}
+	*/
+
+	STOnGOrbit test6 = STOnGOrbit("./OrbitalData/STO3/1/S1", 0, 0, 0, 0, m_nuclearPositions[1]);
+	STOnGOrbit test7 = STOnGOrbit("./OrbitalData/STO3/1/S1", 0, 0, 0, 0, m_nuclearPositions[2]);
+	STOnGOrbit test1 = STOnGOrbit("./OrbitalData/STO3/8/S1", 0, 0, 0, 0, m_nuclearPositions[0]);
+	STOnGOrbit test2 = STOnGOrbit("./OrbitalData/STO3/8/S2", 0, 0, 0, 0, m_nuclearPositions[0]);
+	STOnGOrbit test3 = STOnGOrbit("./OrbitalData/STO3/8/P2", 1, 0, 0, 0, m_nuclearPositions[0]);
+	STOnGOrbit test4 = STOnGOrbit("./OrbitalData/STO3/8/P2", 0, 1, 0, 0, m_nuclearPositions[0]);
+	STOnGOrbit test5 = STOnGOrbit("./OrbitalData/STO3/8/P2", 0, 0, 1, 0, m_nuclearPositions[0]);
+
+	m_basisSet.Append(test1);
+	m_basisSet.Append(test2);
+	m_basisSet.Append(test3);
+	m_basisSet.Append(test4);
+	m_basisSet.Append(test5);
+	m_basisSet.Append(test6);
+	m_basisSet.Append(test7);
+
 }
 
 double Molecule::CalculatePotential(int z1, int z2, Vector<double> ionLocation1,

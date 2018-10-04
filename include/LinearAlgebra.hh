@@ -23,6 +23,9 @@ Vector<double> TruncateLower(const Vector<double> &vector, int index);
 // Returns the same vector with everything below index removed
 Vector<double> TruncateUpper(const Vector<double> &vector, int index);
 
+// Returns the trace of the matrix
+double Trace(const Matrix<double> &matrix);
+
 // Returns the transpose of the matrix.
 Matrix<double> Transpose(const Matrix<double> &matrix);
 
