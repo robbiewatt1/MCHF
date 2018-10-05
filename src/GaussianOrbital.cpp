@@ -429,7 +429,7 @@ double GaussianOrbital::ElectronFunction(int l, int l_p, int r, int r_p, int i, 
 	double posPA = posA - posP;
 	double posPB = posB - posP;
 	double posQC = posC - posQ;
-	double posQD = posD - posP;
+	double posQD = posD - posQ;
 	double result = std::pow(-1.0, l_p) * ThetaFn(l, l1, l2, posPA, posPB, r, gamma1) 
 				  * ThetaFn(l_p, l3, l4, posQC, posQD, r_p, gamma2) * std::pow(-1.0, i) 
 				  * std::pow(2.0 * delta, 2.0 * (r + r_p)) * Functions::Factorial(l + l_p - 2.0 * (r + r_p))

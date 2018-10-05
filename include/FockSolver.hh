@@ -29,7 +29,7 @@ private:
 
 	void ElectronRepulsionSolver();
 
-	double IonPotential(int z1, int z2, Vector<double> ionLocation1, Vector<double> ionLocation2);
+	double IonPotential();
 
 	void InitialGuess();
 

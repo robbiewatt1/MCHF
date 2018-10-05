@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 2*2*2*2*2*32*maxU);
 	std::ofstream outfile("./OutputData/CarbonEnergy.dat");
 
-	Molecule mol = Molecule(5, charges, positions, maxL, boyFn, "./OrbitalData/STO3/");
+	Molecule mol = Molecule(2, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
 	mol.CalculateEnergy();
 
 

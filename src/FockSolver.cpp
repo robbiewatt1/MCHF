@@ -27,11 +27,11 @@ void FockSolver::Solve()
 	// Solve for the one electron matrix. This only needs to be done once
 	OneElectronSolver();
 	ElectronRepulsionSolver();
-	for (int i = 0; i < 2; i++)
+
+	for (int i = 0; i < 20; i++)
 	{
 		TwoElectronSolver();
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy + 2.0 * m_coulombEnergy - m_exchangeEnergy;
-		//(2.0 * m_coulombEnergy - m_exchangeEnergy).Print();
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
 		Vector<double> othgTransVector;
 		Matrix<double> othgTransMatrix;
@@ -52,7 +52,6 @@ void FockSolver::Solve()
 		}
 		othgTransMatrix = othgTransMatrix * eigenMatrix * LinearAlgebra::Transpose(othgTransMatrix);
 		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
-		fockMaxtrix.Print();
 		Matrix<double> orbitalCoeff;
 		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeff, m_energyLevels);
 		orbitalCoeff = othgTransMatrix * orbitalCoeff;
@@ -69,22 +68,17 @@ void FockSolver::Solve()
 				m_density[j][k] = sum;
 			}
 		}
-		m_density.Print();
-		double sum(0);
+		double groundEnergy(0);
 		for (int j = 0; j < m_basisSet.Length(); ++j)
 		{
 			for (int k = 0; k < m_basisSet.Length(); ++k)
 			{
-				sum += m_density[j][k] * (2.0 * m_oneElectronEnergy[j][k] + 2.0 * m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]);
+				groundEnergy += m_density[j][k] * (2.0 * m_oneElectronEnergy[j][k] + 2.0 * m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]);
 			}
 		}
-		std::cout << sum << std::endl;
+		std::cout << groundEnergy << std::endl;
 		m_energyLevels.Print();
-	//	m_density.Print();
-	//	std::cout << LinearAlgebra::Trace(fockMaxtrix * m_density) << std::endl;
-	//	m_energyLevels.Print();
 	}
-
 }
 
 void FockSolver::OneElectronSolver()
@@ -93,16 +87,6 @@ void FockSolver::OneElectronSolver()
 	m_oneElectronEnergy = Matrix<double>(m_basisSet.Length(), m_basisSet.Length());
 
 	// calculate the ion repulsion potenital
-	double ionPotential(0);
-//	#pragma omp parallel for
-//	for (int i = 0; i < m_nuclearCharges.Length(); i++)
-//	{
-//		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
-//		{
-//			ionPotential += IonPotential(m_nuclearCharges[i], m_nuclearCharges[j],
-//			                             m_nuclearPositions[i], m_nuclearPositions[j]);
-//		}
-//	}
 	#pragma omp parallel for
 	for (int i = 0; i < m_basisSet.Length(); i++)
 	{
@@ -117,7 +101,7 @@ void FockSolver::OneElectronSolver()
 			}
 			double kineticEnergy = m_basisSet[i].KineticOverlap(m_basisSet[j]);
 			m_basisOverlap[i][j] = m_basisSet[i].Overlap(m_basisSet[j]);
-			m_oneElectronEnergy[i][j] = kineticEnergy + nuclearPotential + ionPotential * m_basisOverlap[i][j];
+			m_oneElectronEnergy[i][j] = kineticEnergy + nuclearPotential;
 			m_basisOverlap[j][i] = m_basisOverlap[i][j];
 			m_oneElectronEnergy[j][i] = m_oneElectronEnergy[i][j];
 		}
@@ -192,28 +176,22 @@ void FockSolver::ElectronRepulsionSolver()
 			}
 		}
 	}
-	for (int i = 0; i < m_basisSet.Length(); i++)
-	{
-		for (int j = 0; j <= i; j++)
-		{
-			for (int k = 0; k <= j; k++)
-			{
-				for (int l = 0; l <= k; l++)
-				{
-					std::cout << i+1 << " " << j+1 << " " << k+1 << " " << l+1 << " " << m_eRepulsion[i][j][k][l] << std::endl;
-				}
-			}
-		}
-	}
 }
 
-double FockSolver::IonPotential(int z1, int z2, Vector<double> ionLocation1,
-                                Vector<double> ionLocation2)
+double FockSolver::IonPotential()
 {
-	double ionR = std::sqrt(std::pow(ionLocation1[0] - ionLocation2[0], 2.0)
-	                        + std::pow(ionLocation1[1] - ionLocation2[1], 2.0)
-	                        + std::pow(ionLocation1[2] - ionLocation2[2], 2.0));
-	return z1 * z2 / ionR;
+	double potential(0);
+	for (int i = 0; i < m_nuclearCharges.Length(); i++)
+	{
+		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
+		{
+			potential += (m_nuclearCharges[i] * m_nuclearCharges[j]) / 
+						 (std::sqrt(std::pow(m_nuclearPositions[i][0] - m_nuclearPositions[j][0], 2.0)
+	                			  + std::pow(m_nuclearPositions[i][1] - m_nuclearPositions[j][1], 2.0)
+	                			  + std::pow(m_nuclearPositions[i][2] - m_nuclearPositions[j][2], 2.0)));
+		}
+	}
+	return potential; 
 }
 
 void FockSolver::InitialGuess()

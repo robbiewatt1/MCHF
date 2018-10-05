@@ -40,82 +40,9 @@ Matrix<double> Molecule::GetBasisCoefficients()
 
 void Molecule::CalculateEnergy()
 {
-
 	FockSolver solver = FockSolver(m_nuclearCharges, m_nuclearPositions, m_basisSet,
 								   m_nElectrons, m_boyFn);
 	solver.Solve();
-	/*
-	Matrix<double> energyMaxtrix(m_basisSet.Length(), m_basisSet.Length());
-	Matrix<double> overlapMatrix(m_basisSet.Length(), m_basisSet.Length());
-
-	double potential(0);
-	#pragma omp parallel for
-	for (int i = 0; i < m_nuclearCharges.Length(); i++)
-	{
-		for (int j = i + 1; j < m_nuclearCharges.Length(); j++)
-		{
-			potential += CalculatePotential(m_nuclearCharges[i], m_nuclearCharges[j],
-			                                m_nuclearPositions[i], m_nuclearPositions[j]);
-		}
-	}
-	#pragma omp parallel for
-	for (int i = 0; i < m_basisSet.Length(); i++)
-	{
-		for (int j = i; j < m_basisSet.Length(); j++)
-		{
-			//Check omp is working
-			//std::cout << "\n" << omp_get_thread_num() << "/" << omp_get_num_threads();
-			// loop over ion sights to get nuclear attraction integral
-			double nuclearPotential(0);
-			for (int k = 0; k < m_nuclearCharges.Length(); k++)
-			{
-				nuclearPotential += m_basisSet[i].NuclearOverlap(m_basisSet[j],
-				                    m_nuclearCharges[k],
-									m_nuclearPositions[k], m_boyFn);
-			}
-			double kineticEnergy = m_basisSet[i].KineticOverlap(m_basisSet[j]);
-			overlapMatrix[i][j] = m_basisSet[i].Overlap(m_basisSet[j]);
-			energyMaxtrix[i][j] = kineticEnergy + nuclearPotential + potential * overlapMatrix[i][j];
-
-			// Matrix is symetric
-			overlapMatrix[j][i] = overlapMatrix[i][j];
-			energyMaxtrix[j][i] = energyMaxtrix[i][j];
-		}
-	}
-	// When large number of basis sets are used, it is likely that the overlpa matrix is singular
-	// Therefore this needs to be check and sorted
-	Vector<double> overlapValues;
-	Matrix<double> overlapVector;
-	LinearAlgebra::EigenSolver(overlapMatrix, overlapVector, overlapValues);
-	// eigen values that are smaller than 1e-12 are removed giving a new rectangle overlap matrix.
-	double small = 1e-7 * overlapValues.End();
-	Vector<double> reducedOVal;
-	int dif(0);
-	for (int i = 0; i <overlapValues.Length(); i++)
-	{
-		if(overlapValues[i] > small)
-		{
-			reducedOVal.Append(overlapValues[i]);
-		} else
-		{
-			dif++;
-		}
-	}
-	std::cout << "discared: " << dif << std::endl;
-	Matrix<double> reducedOVec = Matrix<double>(m_basisSet.Length(), reducedOVal.Length());
-	for (int i = 0; i < reducedOVec.GetRows(); i++)
-	{
-		for (int j = 0; j < reducedOVec.GetColumns(); j++)
-		{
-			reducedOVec[i][j] = overlapVector[i][j+dif] / std::sqrt(reducedOVal[j]);
-		}
-	}
-
-	Matrix<double> reducedEnergy = LinearAlgebra::Transpose(reducedOVec) * energyMaxtrix * (reducedOVec);
-	LinearAlgebra::EigenSolver(reducedEnergy,m_basisSetCoefficients, m_energyLevels);
-	m_basisSetCoefficients = reducedOVec * m_basisSetCoefficients;
-
-*/
 }
 
 Vector<double> Molecule::MatrixElement(int level1, int level2)
@@ -248,7 +175,7 @@ void Molecule::OutputData(int level, std::string fileName)
 
 void Molecule::SetBasisSet(std::string basisSetDir)
 {
-/*
+
 	// Loop over all ions involved
 	for (int i = 0; i < m_nuclearPositions.Length(); i++)
 	{
@@ -291,24 +218,6 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 			}
 		}
 	}
-	*/
-
-	STOnGOrbit test6 = STOnGOrbit("./OrbitalData/STO3/1/S1", 0, 0, 0, 0, m_nuclearPositions[1]);
-	STOnGOrbit test7 = STOnGOrbit("./OrbitalData/STO3/1/S1", 0, 0, 0, 0, m_nuclearPositions[2]);
-	STOnGOrbit test1 = STOnGOrbit("./OrbitalData/STO3/8/S1", 0, 0, 0, 0, m_nuclearPositions[0]);
-	STOnGOrbit test2 = STOnGOrbit("./OrbitalData/STO3/8/S2", 0, 0, 0, 0, m_nuclearPositions[0]);
-	STOnGOrbit test3 = STOnGOrbit("./OrbitalData/STO3/8/P2", 1, 0, 0, 0, m_nuclearPositions[0]);
-	STOnGOrbit test4 = STOnGOrbit("./OrbitalData/STO3/8/P2", 0, 1, 0, 0, m_nuclearPositions[0]);
-	STOnGOrbit test5 = STOnGOrbit("./OrbitalData/STO3/8/P2", 0, 0, 1, 0, m_nuclearPositions[0]);
-
-	m_basisSet.Append(test1);
-	m_basisSet.Append(test2);
-	m_basisSet.Append(test3);
-	m_basisSet.Append(test4);
-	m_basisSet.Append(test5);
-	m_basisSet.Append(test6);
-	m_basisSet.Append(test7);
-
 }
 
 double Molecule::CalculatePotential(int z1, int z2, Vector<double> ionLocation1,
