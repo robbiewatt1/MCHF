@@ -42,25 +42,19 @@ int main(int argc, char* argv[])
 	}
 
 	int maxL = 1;
-	int maxU = std::pow(2,12);
-	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 2*2*2*2*2*32*maxU);
-	std::ofstream outfile("./OutputData/CarbonEnergy.dat");
+	int maxU = std::pow(2,16);
+	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 64*maxU);
+	std::ofstream outfile("./OutputData/H2+.dat");
 
-	Molecule mol = Molecule(2, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
-	mol.CalculateEnergy();
-
-
-/*
-	for(int i = 1000; i >= 1; i--)
+	for(int i = 100; i >= 1; i--)
 	{
 		std::cout << i << std::endl;
-		positions[0][0] = (double)i / 20.0;
-		Molecule mol = Molecule(charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
-		mol.CalculateEnergy();
-		double me  = mol.OscilatorStrength(0,1);
+		positions[0][0] = (double)i / 4.0;
+		Molecule mol = Molecule(1, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
+		double energy = mol.CalculateEnergy();
 
-		outfile << positions[0][0] << "\t" << mol.GetEnergyLevels()[0] << "\t" << mol.GetEnergyLevels()[1] << "\t" << me << std::endl;
+		outfile << positions[0][0] << "\t" << energy << "\n";
 	}
-*/
+
 	return 0;
 }

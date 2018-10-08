@@ -17,6 +17,10 @@ FockSolver::~FockSolver()
 {
 }
 
+double FockSolver::GetGroundEnergy() const
+{
+	return m_groundEnergy;
+}
 
 void FockSolver::Solve()
 {
@@ -28,10 +32,10 @@ void FockSolver::Solve()
 	OneElectronSolver();
 	ElectronRepulsionSolver();
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 80; i++)
 	{
 		TwoElectronSolver();
-		Matrix<double> fockMaxtrix = m_oneElectronEnergy + 2.0 * m_coulombEnergy - m_exchangeEnergy;
+		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
 		Vector<double> othgTransVector;
 		Matrix<double> othgTransMatrix;
@@ -68,16 +72,16 @@ void FockSolver::Solve()
 				m_density[j][k] = sum;
 			}
 		}
-		double groundEnergy(0);
+		double sum(0);
 		for (int j = 0; j < m_basisSet.Length(); ++j)
 		{
 			for (int k = 0; k < m_basisSet.Length(); ++k)
 			{
-				groundEnergy += m_density[j][k] * (2.0 * m_oneElectronEnergy[j][k] + 2.0 * m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]);
+				sum += m_density[j][k] * (m_oneElectronEnergy[j][k] + 0.5 * (m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]));
 			}
 		}
-		std::cout << groundEnergy << std::endl;
 		m_energyLevels.Print();
+		m_groundEnergy = sum + IonPotential();
 	}
 }
 

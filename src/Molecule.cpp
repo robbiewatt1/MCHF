@@ -38,11 +38,13 @@ Matrix<double> Molecule::GetBasisCoefficients()
 	return m_basisSetCoefficients;
 }
 
-void Molecule::CalculateEnergy()
+double Molecule::CalculateEnergy()
 {
 	FockSolver solver = FockSolver(m_nuclearCharges, m_nuclearPositions, m_basisSet,
 								   m_nElectrons, m_boyFn);
 	solver.Solve();
+
+	return solver.GetGroundEnergy();
 }
 
 Vector<double> Molecule::MatrixElement(int level1, int level2)
@@ -194,7 +196,7 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 				fileNames.Append(file->path().string());
 			}
 		}
-		for (int s = 0; s < 1; s++) // Loop over both spin
+		for (int s = 0; s <= 1; s++) // Loop over both spin
 		{
 			// Loop over k, m and n such that the sum is less than the maximum L
 			for (int n = 0; n <= m_maxL; n++)

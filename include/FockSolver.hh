@@ -19,6 +19,8 @@ public:
 
 	~FockSolver();
 
+	double GetGroundEnergy() const;
+
 	void Solve();
 
 private:
@@ -40,6 +42,7 @@ private:
 	Vector<double> m_nuclearCharges;
 	BoysFunction m_boyFn;
 	Matrix<Matrix<double>> m_eRepulsion;
+	double m_groundEnergy;
 
 
 	Matrix<double> m_density;

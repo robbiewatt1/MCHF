@@ -24,7 +24,7 @@ public:
 
 	Matrix<double> GetBasisCoefficients();
 
-	void CalculateEnergy();
+	double CalculateEnergy();
 
 	Vector<double> MatrixElement(int level1, int level2);
 
