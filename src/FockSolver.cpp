@@ -32,7 +32,7 @@ void FockSolver::Solve()
 	OneElectronSolver();
 	ElectronRepulsionSolver();
 
-	for (int i = 0; i < 80; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		TwoElectronSolver();
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
