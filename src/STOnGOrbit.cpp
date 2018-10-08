@@ -126,7 +126,7 @@ double STOnGOrbit::ElectronRepulsion(const STOnGOrbit &orbit1, const STOnGOrbit 
 									 const STOnGOrbit &orbit3, const BoysFunction &boyFn) const
 {
 	double electRepulsiohn(0);
-	if(m_spin == orbit1.m_spin && orbit2.m_spin == orbit3.m_spin)
+	if(m_spin == orbit3.m_spin && orbit1.m_spin == orbit2.m_spin)
 	{
 		for (int i = 0; i < m_gaussianNumber; i++)
 		{

@@ -32,8 +32,9 @@ void FockSolver::Solve()
 	OneElectronSolver();
 	ElectronRepulsionSolver();
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 10; i++)
 	{
+	/*
 		TwoElectronSolver();
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
@@ -80,8 +81,8 @@ void FockSolver::Solve()
 				sum += m_density[j][k] * (m_oneElectronEnergy[j][k] + 0.5 * (m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]));
 			}
 		}
-		m_energyLevels.Print();
-		m_groundEnergy = sum + IonPotential();
+		*/
+		m_groundEnergy = IonPotential();
 	}
 }
 
