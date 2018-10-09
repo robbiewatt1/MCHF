@@ -177,27 +177,26 @@ void Molecule::OutputData(int level, std::string fileName)
 
 void Molecule::SetBasisSet(std::string basisSetDir)
 {
-
-	// Loop over all ions involved
-	for (int i = 0; i < m_nuclearPositions.Length(); i++)
+	for (int s = 0; s <= 1; s++) // Loop over both spin
 	{
-		// First check to see if the directory exists.
-		Vector<std::string> fileNames;
-		std::string ionOrbitals = basisSetDir + std::to_string((int)m_nuclearCharges[i]);
-		if(boost::filesystem::is_directory(ionOrbitals) == false)
+		// Loop over all ions involved
+		for (int i = 0; i < m_nuclearPositions.Length(); i++)
 		{
-			std::cerr << "Error: " << ionOrbitals << " cannot be found" << std::endl;
-			exit(-1); 
-		} else
-		{
-			for(boost::filesystem::directory_iterator file = boost::filesystem::directory_iterator(ionOrbitals);
-				file != boost::filesystem::directory_iterator(); ++file)
+			// First check to see if the directory exists.
+			Vector<std::string> fileNames;
+			std::string ionOrbitals = basisSetDir + std::to_string((int)m_nuclearCharges[i]);
+			if(boost::filesystem::is_directory(ionOrbitals) == false)
 			{
-				fileNames.Append(file->path().string());
+				std::cerr << "Error: " << ionOrbitals << " cannot be found" << std::endl;
+				exit(-1); 
+			} else
+			{
+				for(boost::filesystem::directory_iterator file = boost::filesystem::directory_iterator(ionOrbitals);
+					file != boost::filesystem::directory_iterator(); ++file)
+				{
+					fileNames.Append(file->path().string());
+				}
 			}
-		}
-		for (int s = 0; s <= 1; s++) // Loop over both spin
-		{
 			// Loop over k, m and n such that the sum is less than the maximum L
 			for (int n = 0; n <= m_maxL; n++)
 			{
@@ -220,13 +219,5 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 			}
 		}
 	}
-}
 
-double Molecule::CalculatePotential(int z1, int z2, Vector<double> ionLocation1,
-                                    Vector<double> ionLocation2)
-{
-	double ionR = std::sqrt(std::pow(ionLocation1[0] - ionLocation2[0], 2.0)
-	                        + std::pow(ionLocation1[1] - ionLocation2[1], 2.0)
-	                        + std::pow(ionLocation1[2] - ionLocation2[2], 2.0));
-	return z1 * z2 / ionR;
 }

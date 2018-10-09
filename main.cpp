@@ -41,14 +41,14 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 1;
-	int maxU = std::pow(2,20);
+	int maxL = 0;
+	int maxU = std::pow(2,19);
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 8*maxU);
-	std::ofstream outfile("./OutputData/H2+.dat");
-	for(int i = 20; i >= 1; i--)
+	std::ofstream outfile("./OutputData/H2.dat");
+	for(int i = 200; i >= 1; i--)
 	{
-		std::cout << i << std::endl;
-		positions[0][0] = (double)i / 1.0;
+		positions[0][0] = (double)i / 50.0;
+		std::cout << positions[0][0] << std::endl;
 		Molecule mol = Molecule(2, charges, positions, maxL, boyFn, "./OrbitalData/STO6/");
 		double energy = mol.CalculateEnergy();
 		std::cout << energy << std::endl;

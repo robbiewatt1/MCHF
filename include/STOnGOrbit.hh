@@ -32,6 +32,8 @@ public:
 
 	double GetCoefficient(int i) const;
 
+	int GetSpin() const;
+
 public:
 
 	double Overlap(const STOnGOrbit &orbit) const;

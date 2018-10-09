@@ -31,10 +31,8 @@ void FockSolver::Solve()
 	// Solve for the one electron matrix. This only needs to be done once
 	OneElectronSolver();
 	ElectronRepulsionSolver();
-
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
-	/*
 		TwoElectronSolver();
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
 		// Find matgrix used to transform to othogonal basis. Here I might need to remove bad matricies!
@@ -68,22 +66,25 @@ void FockSolver::Solve()
 				double sum(0);
 				for (int l = 0; l < m_nElectrons; l++)
 				{
-					sum += orbitalCoeff[j][l] * orbitalCoeff[k][l];
+					sum += orbitalCoeff[k][l] * orbitalCoeff[j][l];
 				}
-				m_density[j][k] = sum;
+				m_density[j][k] = 0.5 * (sum + m_density[j][k]);
 			}
 		}
-		double sum(0);
-		for (int j = 0; j < m_basisSet.Length(); ++j)
-		{
-			for (int k = 0; k < m_basisSet.Length(); ++k)
-			{
-				sum += m_density[j][k] * (m_oneElectronEnergy[j][k] + 0.5 * (m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]));
-			}
-		}
-		*/
-		m_groundEnergy = IonPotential();
 	}
+
+
+//	m_groundEnergy = LinearAlgebra::Trace(m_oneElectronEnergy * m_density) + 0.5 * LinearAlgebra::Trace((2.0 * m_coulombEnergy - m_exchangeEnergy) * m_density) + IonPotential(); 
+//	sum + IonPotential();
+	double sum(0);
+	for (int j = 0; j < m_basisSet.Length(); ++j)
+	{
+		for (int k = 0; k < m_basisSet.Length(); ++k)
+		{
+			sum += m_density[j][k] * (m_oneElectronEnergy[j][k] + 0.5 * (m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]));
+		}
+	}
+	m_groundEnergy = sum + IonPotential();
 }
 
 void FockSolver::OneElectronSolver()
