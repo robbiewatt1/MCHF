@@ -8,6 +8,11 @@ double MinValue(const Vector<double> &vector);
 
 double MinValueLocation(const Vector<double> &vector);
 
+// Find the min value of vector or the psoition. Algorythm scales as O(N)
+double MaxValue(const Vector<double> &vector);
+
+double MaxValueLocation(const Vector<double> &vector);
+
 // Returns a vecot with all the elemts replaced with their absolute value
 Vector<double> Absolute(const Vector<double> &vector);
 

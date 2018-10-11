@@ -22,16 +22,13 @@ double FockSolver::GetGroundEnergy() const
 	return m_groundEnergy;
 }
 
-void FockSolver::Solve(int itrMax, int nInterp)
+void FockSolver::GroundSolve(int itrMax, int nInterp)
 {
 	InitialGuess();
 	OneElectronSolver();
 	ElectronRepulsionSolver();
 
-	Vector<double> fockCoeffs(nInterp);
-	Vector<Matrix<double>> fockVector(nInterp);
-	Vector<Matrix<double>> errorVector(nInterp);
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < itrMax; i++)
 	{
 		TwoElectronSolver();
 		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
@@ -55,61 +52,11 @@ void FockSolver::Solve(int itrMax, int nInterp)
 		}
 		othgTransMatrix = othgTransMatrix * eigenMatrix * LinearAlgebra::Transpose(othgTransMatrix);
 
-		// apply the DIIS process to improve convergence
-		Matrix<double> errorMatrix = LinearAlgebra::Transpose(othgTransMatrix) 
-						            * (fockMaxtrix * m_density * m_basisOverlap
-						            - m_basisOverlap * m_density * fockMaxtrix) * othgTransMatrix;
 
-		// Fill the error and fock Vectors
-		if (i < nInterp)
-		{
-			errorVector[i] = errorMatrix;
-			fockVector[i]  = fockMaxtrix;
-		} else
-		{
-			errorVector[i%nInterp] = errorMatrix;
-			fockVector[i%nInterp] = fockMaxtrix;
-		}
+		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
 
-		// Form the Beta matrix and solution vector
-		if (i = 0)
-		{
-			fockCoeffs[0] = 1;
-			fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
-		}else
-		{
-			Matrix<double> beta(i+2,i+2);
-			Vector<double> alpha(i+2);
-			for (int j = 0; j < i+2; j++)
-			{
-				if (j == i + 1)
-				{
-					alpha[j] = -1;
-				}else
-				{
-					alphaj[j] = 0;
-				}
-				for (int k = 0; k < i+2; k++)
-				{
-					if (j == i + 1 || k == i + 1)
-					{
-						beta[j][k] = -1;
-					} else
-					{
-						beta[j][k] = LinearAlgebra::Trace(LinearAlgebra::Transpose(errorVector[j]) * errorVector[k]);
-					}
-				}
-			}
-		}
-
-//		if (i < nErrors)
-//		{
-//			fockVector[i] = fockMaxtrix;
-//		}
-
-		Matrix<double> orbitalCoeff;
-		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeff, m_energyLevels);
-		orbitalCoeff = othgTransMatrix * orbitalCoeff;
+		LinearAlgebra::EigenSolver(fockMaxtrix, m_orbitalCoeff, m_fockyLevels);
+		m_orbitalCoeff = othgTransMatrix * m_orbitalCoeff;
 		
 		// only occupided oribtals for the aubjua lowest energy
 		for (int j = 0; j < m_basisSet.Length(); j++)
@@ -119,16 +66,13 @@ void FockSolver::Solve(int itrMax, int nInterp)
 				double sum(0);
 				for (int l = 0; l < m_nElectrons; l++)
 				{
-					sum += orbitalCoeff[k][l] * orbitalCoeff[j][l];
+					sum += m_orbitalCoeff[k][l] * m_orbitalCoeff[j][l];
 				}
 				m_density[j][k] = sum;
 			}
 		}
 	}
 
-
-//	m_groundEnergy = LinearAlgebra::Trace(m_oneElectronEnergy * m_density) + 0.5 * LinearAlgebra::Trace((2.0 * m_coulombEnergy - m_exchangeEnergy) * m_density) + IonPotential(); 
-//	sum + IonPotential();
 	double sum(0);
 	for (int j = 0; j < m_basisSet.Length(); ++j)
 	{
@@ -138,8 +82,111 @@ void FockSolver::Solve(int itrMax, int nInterp)
 		}
 	}
 	m_groundEnergy = sum + IonPotential();
+}
+
+void FockSolver::ExcitedSolver(int itrMax)
+{
+	// check that groun state has been solved.
+	if (m_fockyLevels.Length() == 0)
+	{
+		std::cerr << "Error: Must find ground state first." << std::endl;
+		exit(-1);
+	}
+	// Form the starting density matrix using the next highest virtual
+	for (int i = 0; i < m_basisSet.Length(); i++)
+	{
+		for (int j = 0; j <  m_basisSet.Length(); j++)
+		{
+			double sum(0);
+			for (int k = 0; k < m_nElectrons; k++)
+			{
+				if (k == m_nElectrons+1)
+				{
+					continue;
+				} else
+				{
+					sum += m_orbitalCoeff[j][k] * m_orbitalCoeff[i][k];
+				}
+			}
+			m_density[i][j] = sum;
+		}
+	}
+
+	// Enter the normal fock loop
+	Matrix<double> orbitalCoeffNew;
+	for (int i = 0; i < itrMax; i++)
+	{
+		TwoElectronSolver();
+		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
+
+		Vector<double> othgTransVector;
+		Matrix<double> othgTransMatrix;
+		LinearAlgebra::EigenSolver(m_basisOverlap, othgTransMatrix, othgTransVector);
+		Matrix<double> eigenMatrix(m_basisOverlap.GetRows(), m_basisOverlap.GetColumns());
+		for (int j = 0; j < m_basisOverlap.GetRows(); j++)
+		{
+			for (int k = 0; k < m_basisOverlap.GetColumns(); k++)
+			{
+				if (k == j)
+				{
+					eigenMatrix[k][k] = 1.0 / std::sqrt(othgTransVector[k]);
+				} else
+				{
+					eigenMatrix[j][k] = 0;
+				}
+			}
+		}
+		othgTransMatrix = othgTransMatrix * eigenMatrix * LinearAlgebra::Transpose(othgTransMatrix);
+		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
+		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeffNew, m_fockyLevels);
+		orbitalCoeffNew = othgTransMatrix * orbitalCoeffNew;
+		
+		Matrix<double> maxOverlap = LinearAlgebra::Transpose(m_orbitalCoeff) * m_basisOverlap * orbitalCoeffNew;
+		Vector<double> projections(maxOverlap.GetRows());
+		for (int j = 0; j < maxOverlap.GetRows(); ++j)
+		{
+			for (int k = 0; k < maxOverlap.GetColumns(); k++)
+			{
+				projections[j] += (maxOverlap[j][k]);
+			}
+		}
+		projections.Print();
+		// find the n largest projections
+		Vector<int> indexVector(m_nElectrons);
+		for (int j = 0; j < m_nElectrons; j++)
+		{
+			int maxIndex = LinearAlgebra::MaxValueLocation(projections);
+			indexVector[j] = j;
+			projections[maxIndex] = 0;
+		}
+		// only occupided oribtals for the aubjua lowest energy
+		for (int j = 0; j < m_basisSet.Length(); j++)
+		{
+			for (int k = 0; k <  m_basisSet.Length(); k++)
+			{
+				double sum(0);
+				for (int l = 0; l < m_nElectrons; l++)
+				{
+					sum += orbitalCoeffNew[k][indexVector[l]] * orbitalCoeffNew[j][indexVector[l]];
+				}
+				m_density[j][k] = sum;
+			}
+		}
+	}
+	double sum(0);
+	for (int j = 0; j < m_basisSet.Length(); ++j)
+	{
+		for (int k = 0; k < m_basisSet.Length(); ++k)
+		{
+			sum += m_density[j][k] * (m_oneElectronEnergy[j][k] + 0.5 * (m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]));
+		}
+	}
+	double excitedEnergy;
+	m_groundEnergy = sum + IonPotential();
 	std::cout << m_groundEnergy << std::endl;
 }
+
+
 
 void FockSolver::OneElectronSolver()
 {
@@ -263,15 +310,13 @@ void FockSolver::InitialGuess()
 	{
 		for (int j = 0; j < m_basisSet.Length(); ++j)
 		{
-			m_density[i][j] = 0.0;
-		}
-	}
-
-	for (int i = 0; i < 1; ++i)
-	{
-		for (int j = 0; j < m_basisSet.Length(); ++j)
-		{
-			m_density[i+(j*m_basisSet.Length() / m_basisSet.Length())][j] = 0.0;
+			if (i == j && i == 0)
+			{
+				m_density[i][j] = 1.0;
+			} else
+			{
+				m_density[i][j] = 1.0;
+			}
 		}
 	}
 }

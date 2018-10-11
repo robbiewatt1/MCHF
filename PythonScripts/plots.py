@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-data = np.loadtxt("./OutputData/H2.dat")
+data = np.loadtxt("./OutputData/H2l.dat")
 
 plt.figure(1)
 plt.plot(data[:, 0], data[:, 1])

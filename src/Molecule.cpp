@@ -42,7 +42,8 @@ double Molecule::CalculateEnergy()
 {
 	FockSolver solver = FockSolver(m_nuclearCharges, m_nuclearPositions, m_basisSet,
 								   m_nElectrons, m_boyFn);
-	solver.Solve();
+	solver.GroundSolve();
+	solver.ExcitedSolver();
 
 	return solver.GetGroundEnergy();
 }

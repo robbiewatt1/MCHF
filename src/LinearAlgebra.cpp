@@ -31,6 +31,31 @@ double LinearAlgebra::MinValueLocation(const Vector<double> &vector)
 	return minPosition;
 }
 
+double LinearAlgebra::MaxValue(const Vector<double> &vector)
+{
+	double large = vector(0);
+	for (int i = 1; i < vector.Length(); ++i)
+	{
+		if (vector(i) > large) {large = vector(i);}
+	}
+	return large;
+}
+
+double LinearAlgebra::MaxValueLocation(const Vector<double> &vector)
+{
+	double large = vector(0);
+	int maxPosition = 0;
+	for (int i = 1; i < vector.Length(); ++i)
+	{
+		if (vector(i) > large)
+		{
+			large = vector(i);
+			maxPosition = i;
+		}
+	}
+	return maxPosition;
+}
+
 Vector<double> LinearAlgebra::Absolute(const Vector<double> &vector)
 {
 	Vector<double> absoulteVector(vector);

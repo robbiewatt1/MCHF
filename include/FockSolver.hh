@@ -25,7 +25,10 @@ public:
 	// uses a DIIS scheme to help with convergence. This extroplates
 	// with the fock matrix and the error matrix defined by the 
 	// commutation of the fock matrix and the density matrix
-	void Solve(int itrMax = 100, int nInterp = 8);
+	void GroundSolve(int itrMax = 100, int nInterp = 8);
+
+	// Solves for the excited states using a MOM method. see Andrew T. B paper
+	void ExcitedSolver(int itrMax = 500);
 
 private:
 
@@ -50,12 +53,12 @@ private:
 
 
 	Matrix<double> m_density;
+	Matrix<double> m_orbitalCoeff;
 	Matrix<double> m_basisOverlap;
 	Matrix<double> m_oneElectronEnergy;
 	Matrix<double> m_exchangeEnergy;
 	Matrix<double> m_coulombEnergy;
-
-	Vector<double> m_energyLevels;
+	Vector<double> m_fockyLevels;
 
 };
 #endif
