@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 	int maxU = std::pow(2,19);
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 8*maxU);
 	std::ofstream outfile("./OutputData/H2.dat");
-	for(int i = 200; i >= 1; i--)
+	for(int i = 300; i >= 1; i--)
 	{
 		positions[0][0] = (double)i / 50.0;
 		std::cout << positions[0][0] << std::endl;

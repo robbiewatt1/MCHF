@@ -21,7 +21,11 @@ public:
 
 	double GetGroundEnergy() const;
 
-	void Solve();
+	// itertitve processes to fine the energy lelvels of the molecule
+	// uses a DIIS scheme to help with convergence. This extroplates
+	// with the fock matrix and the error matrix defined by the 
+	// commutation of the fock matrix and the density matrix
+	void Solve(int itrMax = 100, int nInterp = 8);
 
 private:
 

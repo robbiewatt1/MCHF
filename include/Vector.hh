@@ -40,7 +40,7 @@ public:
 		// Check if T is double / int /complex. If so then set all values to 0;
 		for (int i = 0; i < m_nElements; i++)
 		{
-			m_data[i] = 0;
+	//		m_data[i] = 0;
 		}
 	}
 
