@@ -41,17 +41,25 @@ int main(int argc, char* argv[])
 		positions.Append(position);
 	}
 
-	int maxL = 1;
-	int maxU = std::pow(2,14);
+	int maxL = 0;
+	int maxU = std::pow(2,12);
 	BoysFunction boyFn = BoysFunction(4 * maxL, maxU, 8*maxU);
+	Molecule mol = Molecule(2, charges, positions, maxL, boyFn, "./OrbitalData/STO3/");
+	Vector<double> axis(300);
+	Vector<double> energy(300);
+
 	std::ofstream outfile("./OutputData/H2l.dat");
-	for(int i = 300; i >= 1; i--)
+	for(int i = 300; i > 1; i--)
 	{
-		positions[0][0] = (double)i / 50.0;
-		std::cout << positions[0][0] << std::endl;
-		Molecule mol = Molecule(1, charges, positions, maxL, boyFn, "./OrbitalData/STO3/");
-		double energy = mol.CalculateEnergy();
-		outfile << positions[0][0] << "\t" << energy << "\n";
+		axis[300-i] = (double)(i) / 20.0;
 	}
+//	energy = mol.CalculateGroundCurve(axis);
+	energy = mol.CalculateExcitedCurve(axis, 1);
+	for (int i = 0; i < 300; ++i)
+	{
+		outfile << axis[i] << "\t" << energy[i] << "\n";
+	}
+	std::cout << "end" << std::endl;
+	
 	return 0;
 }

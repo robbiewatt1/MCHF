@@ -18,9 +18,9 @@ Molecule::Molecule(int nElectrons, const Vector<double> &nuclearCharges,
 				   const Vector<Vector<double>> &nuclearPositions, int maxL,
 				   const BoysFunction &boyFn, std::string basisSetDir):
 m_nuclearCharges(nuclearCharges), m_nuclearPositions(nuclearPositions), m_maxL(maxL),
-m_nElectrons(nElectrons)
+m_nElectrons(nElectrons), m_basisSetDir(basisSetDir)
 {
-	SetBasisSet(basisSetDir);
+	SetBasisSet(m_basisSetDir);
 	m_boyFn = boyFn;
 }
 
@@ -44,8 +44,43 @@ double Molecule::CalculateEnergy()
 								   m_nElectrons, m_boyFn);
 	solver.GroundSolve();
 	solver.ExcitedSolver();
-
 	return solver.GetGroundEnergy();
+}
+
+Vector<double> Molecule::CalculateGroundCurve(Vector<double> xAxis)
+{
+	// First solve for single electron case
+	FockSolver solver = FockSolver(m_nuclearCharges, m_nuclearPositions, m_basisSet,
+			 					   m_nElectrons, m_boyFn);
+	Vector<double> energy(xAxis.Length());
+	for (int i = 0; i < xAxis.Length(); ++i)
+	{
+		m_nuclearPositions[0][0] = xAxis[i];
+		solver.SetNuclearPosition(0, 0, xAxis[i]);	
+		solver.UpdateBasisSet(SetBasisSet(m_basisSetDir));
+		solver.GroundSolve(30);
+		energy[i] = solver.GetGroundEnergy();
+		std::cout << energy[i] << std::endl;
+	}
+	return energy;
+}
+
+Vector<double> Molecule::CalculateExcitedCurve(Vector<double> xAxis, int level)
+{
+	FockSolver solver = FockSolver(m_nuclearCharges, m_nuclearPositions, m_basisSet,
+ 			 					   m_nElectrons, m_boyFn);
+	Vector<double> energy(xAxis.Length());
+	solver.ExcitedGuess();
+	for (int i = 0; i < xAxis.Length(); ++i)
+	{
+		m_nuclearPositions[0][0] = xAxis[i];
+		solver.SetNuclearPosition(0, 0, xAxis[i]);	
+		solver.UpdateBasisSet(SetBasisSet(m_basisSetDir));
+		solver.ExcitedSolver(30);
+		energy[i] = solver.GetGroundEnergy();
+		std::cout << energy[i] << std::endl;
+	}
+	return energy;
 }
 
 Vector<double> Molecule::MatrixElement(int level1, int level2)
@@ -176,8 +211,9 @@ void Molecule::OutputData(int level, std::string fileName)
 	delete file;
 }
 
-void Molecule::SetBasisSet(std::string basisSetDir)
+Vector<STOnGOrbit> Molecule::SetBasisSet(std::string basisSetDir)
 {
+	m_basisSet.Clear();
 	for (int s = 0; s <= 1; s++) // Loop over both spin
 	{
 		// Loop over all ions involved
@@ -220,5 +256,5 @@ void Molecule::SetBasisSet(std::string basisSetDir)
 			}
 		}
 	}
-
+	return m_basisSet;
 }

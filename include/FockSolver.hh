@@ -21,14 +21,22 @@ public:
 
 	double GetGroundEnergy() const;
 
+	void SetNuclearPosition(int ion, int direction, double position);
+
+	void UpdateBasisSet(const Vector<STOnGOrbit> &basisSet);
+
 	// itertitve processes to fine the energy lelvels of the molecule
 	// uses a DIIS scheme to help with convergence. This extroplates
 	// with the fock matrix and the error matrix defined by the 
 	// commutation of the fock matrix and the density matrix
-	void GroundSolve(int itrMax = 100, int nInterp = 8);
+	void GroundSolve(int itrMax = 100, int nInterp = 8, bool initGuess = false);
 
 	// Solves for the excited states using a MOM method. see Andrew T. B paper
-	void ExcitedSolver(int itrMax = 500);
+	void ExcitedSolver(int itrMax = 500, int nInterp = 8);
+
+	void ExcitedGuess();
+
+	void InitialGuess();
 
 private:
 
@@ -40,9 +48,8 @@ private:
 
 	double IonPotential();
 
-	void InitialGuess();
 
-private:
+public:
 	int m_nElectrons;
 	Vector<STOnGOrbit> m_basisSet;
 	Vector<Vector<double>> m_nuclearPositions;

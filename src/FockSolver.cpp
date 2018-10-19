@@ -11,6 +11,7 @@ FockSolver::FockSolver(const Vector<double> &nuclearCharges,
 	m_nuclearCharges(nuclearCharges)
 {
 	m_boyFn = boyFn;
+	InitialGuess();				
 }
 
 FockSolver::~FockSolver()
@@ -22,12 +23,21 @@ double FockSolver::GetGroundEnergy() const
 	return m_groundEnergy;
 }
 
-void FockSolver::GroundSolve(int itrMax, int nInterp)
+void FockSolver::SetNuclearPosition(int ion, int direction, double position)
 {
-	InitialGuess();
+	m_nuclearPositions[ion][direction] = position;
+}
+
+void FockSolver::UpdateBasisSet(const Vector<STOnGOrbit> &basisSet)
+{
+	m_basisSet.Clear();
+	m_basisSet = basisSet;
+}
+
+void FockSolver::GroundSolve(int itrMax, int nInterp, bool initGuess)
+{
 	OneElectronSolver();
 	ElectronRepulsionSolver();
-
 	for (int i = 0; i < itrMax; i++)
 	{
 		TwoElectronSolver();
@@ -51,20 +61,25 @@ void FockSolver::GroundSolve(int itrMax, int nInterp)
 			}
 		}
 		othgTransMatrix = othgTransMatrix * eigenMatrix * LinearAlgebra::Transpose(othgTransMatrix);
-
-
 		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
 
 		LinearAlgebra::EigenSolver(fockMaxtrix, m_orbitalCoeff, m_fockyLevels);
 		m_orbitalCoeff = othgTransMatrix * m_orbitalCoeff;
-		
 		// only occupided oribtals for the aubjua lowest energy
+		int nElectrons;
+		if (initGuess == false)
+		{
+			nElectrons = m_nElectrons;
+		} else
+		{
+			nElectrons = 1;
+		}
 		for (int j = 0; j < m_basisSet.Length(); j++)
 		{
 			for (int k = 0; k <  m_basisSet.Length(); k++)
 			{
 				double sum(0);
-				for (int l = 0; l < m_nElectrons; l++)
+				for (int l = 0; l < nElectrons; l++)
 				{
 					sum += m_orbitalCoeff[k][l] * m_orbitalCoeff[j][l];
 				}
@@ -72,7 +87,6 @@ void FockSolver::GroundSolve(int itrMax, int nInterp)
 			}
 		}
 	}
-
 	double sum(0);
 	for (int j = 0; j < m_basisSet.Length(); ++j)
 	{
@@ -84,40 +98,21 @@ void FockSolver::GroundSolve(int itrMax, int nInterp)
 	m_groundEnergy = sum + IonPotential();
 }
 
-void FockSolver::ExcitedSolver(int itrMax)
+void FockSolver::ExcitedSolver(int itrMax,  int nInterp)
 {
 	// check that groun state has been solved.
-	if (m_fockyLevels.Length() == 0)
-	{
-		std::cerr << "Error: Must find ground state first." << std::endl;
-		exit(-1);
-	}
+	// First solve for single electron case
 	// Form the starting density matrix using the next highest virtual
-	for (int i = 0; i < m_basisSet.Length(); i++)
-	{
-		for (int j = 0; j <  m_basisSet.Length(); j++)
-		{
-			double sum(0);
-			for (int k = 0; k < m_nElectrons; k++)
-			{
-				if (k == m_nElectrons+1)
-				{
-					continue;
-				} else
-				{
-					sum += m_orbitalCoeff[j][k] * m_orbitalCoeff[i][k];
-				}
-			}
-			m_density[i][j] = sum;
-		}
-	}
-
+	//std::cout << m_groundEnergy << std::endl;
 	// Enter the normal fock loop
+	OneElectronSolver();
+	ElectronRepulsionSolver();
 	Matrix<double> orbitalCoeffNew;
+	Matrix<double> fockMaxtrix;
 	for (int i = 0; i < itrMax; i++)
 	{
 		TwoElectronSolver();
-		Matrix<double> fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
+		fockMaxtrix = m_oneElectronEnergy + m_coulombEnergy - m_exchangeEnergy;
 
 		Vector<double> othgTransVector;
 		Matrix<double> othgTransMatrix;
@@ -140,23 +135,32 @@ void FockSolver::ExcitedSolver(int itrMax)
 		fockMaxtrix = LinearAlgebra::Transpose(othgTransMatrix) * fockMaxtrix * othgTransMatrix;
 		LinearAlgebra::EigenSolver(fockMaxtrix, orbitalCoeffNew, m_fockyLevels);
 		orbitalCoeffNew = othgTransMatrix * orbitalCoeffNew;
-		
-		Matrix<double> maxOverlap = LinearAlgebra::Transpose(m_orbitalCoeff) * m_basisOverlap * orbitalCoeffNew;
-		Vector<double> projections(maxOverlap.GetRows());
-		for (int j = 0; j < maxOverlap.GetRows(); ++j)
-		{
-			for (int k = 0; k < maxOverlap.GetColumns(); k++)
+
+
+		Matrix<double> maxOverlap;// = LinearAlgebra::Transpose(m_orbitalCoeff) * m_basisOverlap * orbitalCoeffNew;
+		Vector<double> projections(m_basisOverlap.GetRows());
+
+
+		for (int j = 0; j < m_basisOverlap.GetRows(); ++j)
+		{	
+			projections[j] = 0;
+			for (int h = 0; h < m_basisOverlap.GetRows(); ++h)
 			{
-				projections[j] += (maxOverlap[j][k]);
+				for (int k = 0; k < m_basisOverlap.GetColumns(); ++k)
+				{
+					for (int l = 0; l < m_nElectrons; ++l)
+					{
+						projections[j] += m_orbitalCoeff[l][k] * m_basisOverlap[k][h] * orbitalCoeffNew[h][j];
+					}
+				}
 			}
 		}
-		projections.Print();
 		// find the n largest projections
 		Vector<int> indexVector(m_nElectrons);
 		for (int j = 0; j < m_nElectrons; j++)
 		{
-			int maxIndex = LinearAlgebra::MaxValueLocation(projections);
-			indexVector[j] = j;
+			int maxIndex = LinearAlgebra::MaxValueLocation(LinearAlgebra::Absolute(projections));
+			indexVector[j] = maxIndex;
 			projections[maxIndex] = 0;
 		}
 		// only occupided oribtals for the aubjua lowest energy
@@ -181,12 +185,37 @@ void FockSolver::ExcitedSolver(int itrMax)
 			sum += m_density[j][k] * (m_oneElectronEnergy[j][k] + 0.5 * (m_coulombEnergy[j][k] - m_exchangeEnergy[j][k]));
 		}
 	}
-	double excitedEnergy;
 	m_groundEnergy = sum + IonPotential();
-	std::cout << m_groundEnergy << std::endl;
 }
 
-
+void FockSolver::ExcitedGuess()
+{
+	int level = 0;
+	GroundSolve(100, 8, true);
+	// form the initial density
+	Matrix<double> test(m_basisSet.Length(), m_nElectrons);
+	m_orbitalCoeff.Print();
+	for (int i = 0; i < m_basisSet.Length(); ++i)
+	{
+		for (int j = 0; j < m_nElectrons; ++j)
+		{
+			test[i][j] = m_orbitalCoeff[i][level];
+		}
+	}
+	test.Print();
+	m_fockyLevels.Print();
+	getchar();
+	for (int j = 0; j < m_basisSet.Length(); j++)
+	{
+		for (int k = 0; k <  m_basisSet.Length(); k++)
+		{
+			for (int l = 0; l < m_nElectrons; ++l)
+			{
+				m_density[j][k] = test[k][l] * test[j][l];
+			}
+		}
+	}
+}
 
 void FockSolver::OneElectronSolver()
 {
@@ -244,41 +273,46 @@ void FockSolver::TwoElectronSolver()
 
 void FockSolver::ElectronRepulsionSolver()
 {
-	// initailsie the 4D array
-	m_eRepulsion = Matrix<Matrix<double>>(m_basisSet.Length(),m_basisSet.Length());
-	for (int i = 0; i < m_basisSet.Length(); i++)
+	if (false)
 	{
-		for (int j = 0; j < m_basisSet.Length(); j++)
-		{
-			m_eRepulsion[i][j] = Matrix<double>(m_basisSet.Length(),m_basisSet.Length());
-		}
-	}
-	#pragma omp parallel for	
-	for (int i = 0; i < m_basisSet.Length(); i++)
+		// Will add in an OS solver here soon
+	} else
 	{
-		for (int j = 0; j <= i; j++)
+		m_eRepulsion = Matrix<Matrix<double>>(m_basisSet.Length(),m_basisSet.Length());
+		for (int i = 0; i < m_basisSet.Length(); i++)
 		{
-			for (int k = 0; k <= i; k++)
+			for (int j = 0; j < m_basisSet.Length(); j++)
 			{
-				int lMax;
-				if (i == k)
+				m_eRepulsion[i][j] = Matrix<double>(m_basisSet.Length(),m_basisSet.Length());
+			}
+		}
+		#pragma omp parallel for	
+		for (int i = 0; i < m_basisSet.Length(); i++)
+		{
+			for (int j = 0; j <= i; j++)
+			{
+				for (int k = 0; k <= i; k++)
 				{
-					lMax = j;
-				} else
-				{
-					lMax = k;
-				}
-				for (int l = 0; l <= lMax; l++)
-				{
-					m_eRepulsion[i][j][k][l] = m_basisSet[i].ElectronRepulsion(m_basisSet[j],
-										  			  m_basisSet[k], m_basisSet[l], m_boyFn);
-					m_eRepulsion[i][j][l][k] = m_eRepulsion[i][j][k][l];
-					m_eRepulsion[j][i][k][l] = m_eRepulsion[i][j][k][l];
-					m_eRepulsion[j][i][l][k] = m_eRepulsion[i][j][k][l];
-					m_eRepulsion[k][l][i][j] = m_eRepulsion[i][j][k][l];
-					m_eRepulsion[k][l][j][i] = m_eRepulsion[i][j][k][l];
-					m_eRepulsion[l][k][i][j] = m_eRepulsion[i][j][k][l];
-					m_eRepulsion[l][k][j][i] = m_eRepulsion[i][j][k][l];			
+					int lMax;
+					if (i == k)
+					{
+						lMax = j;
+					} else
+					{
+						lMax = k;
+					}
+					for (int l = 0; l <= lMax; l++)
+					{
+						m_eRepulsion[i][j][k][l] = m_basisSet[i].ElectronRepulsion(m_basisSet[j],
+											  			  m_basisSet[k], m_basisSet[l], m_boyFn);
+						m_eRepulsion[i][j][l][k] = m_eRepulsion[i][j][k][l];
+						m_eRepulsion[j][i][k][l] = m_eRepulsion[i][j][k][l];
+						m_eRepulsion[j][i][l][k] = m_eRepulsion[i][j][k][l];
+						m_eRepulsion[k][l][i][j] = m_eRepulsion[i][j][k][l];
+						m_eRepulsion[k][l][j][i] = m_eRepulsion[i][j][k][l];
+						m_eRepulsion[l][k][i][j] = m_eRepulsion[i][j][k][l];
+						m_eRepulsion[l][k][j][i] = m_eRepulsion[i][j][k][l];			
+					}
 				}
 			}
 		}
@@ -312,11 +346,13 @@ void FockSolver::InitialGuess()
 		{
 			if (i == j && i == 0)
 			{
-				m_density[i][j] = 1.0;
+				m_density[i][j] = 0.0;
 			} else
 			{
 				m_density[i][j] = 1.0;
 			}
 		}
 	}
+	m_density.Print();
+	getchar();
 }

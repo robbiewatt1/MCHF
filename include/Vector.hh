@@ -50,6 +50,13 @@ public:
 		delete [] m_data;
 	}
 
+	void Clear()
+	{
+		m_nElements = 0;
+		delete [] m_data;
+		m_data = nullptr;
+	}
+
 	// Return the length of the Vector
 	int Length() const
 	{

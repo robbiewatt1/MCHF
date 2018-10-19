@@ -26,6 +26,10 @@ public:
 
 	double CalculateEnergy();
 
+	Vector<double> CalculateGroundCurve(Vector<double> xAxis);
+
+	Vector<double> CalculateExcitedCurve(Vector<double> xAxis, int level);
+
 	Vector<double> MatrixElement(int level1, int level2);
 
 	double OscilatorStrength(int level1, int level2);
@@ -45,7 +49,7 @@ public:
 
 private:
 
-	void SetBasisSet(std::string basisSetDir);
+	Vector<STOnGOrbit> SetBasisSet(std::string basisSetDir);
 	// Sets up the basis set vecotr. All orbitals l = n + m + k <= lMax * number of ions
 
 	double CalculatePotential(int z1, int z2, Vector<double> ionLocation1,
@@ -58,6 +62,7 @@ private:
 	Vector<Vector<double>> m_nuclearPositions;	// Vector containing the position of each ion
 	int m_maxL;									// The maximum angular momentum of each basis set
 	int m_nElectrons;							// Number of electrons in molecule
+	std::string m_basisSetDir;
 
 	Vector<STOnGOrbit> m_basisSet;				// Vector of the basis set functions
 	Vector<double> m_energyLevels;				// Vector of the energy levels
